@@ -10,7 +10,7 @@ import { dbq } from "#config/db";
 import ResponseMessage from "#services/response_message";
 
 const rules = type({
-    productId: 'string & string > 0'
+    product: 'string & string > 0'
 });
 
 type ParamsType = typeof rules.infer
@@ -21,8 +21,8 @@ export default class DeleteProductFeature extends BaseFeature<TError, any> {
         return await DeleteProductFeature.use<typeof params, typeof params>(params)
                                         // .withAuth()
                                         .chain( (_, data) => ValidationService.validate({ rules, data }))
-                                        .chain( (_, data) => validateProduct( data.productId ) )
-                                        .chain( (_, data) => this.deleteProduct( data.productId ) )
+                                        .chain( (_, data) => validateProduct( data.product ) )
+                                        .chain( (_, data) => this.deleteProduct( data.product) )
                                         .chain( (_, __) => ResponseMessage.successMessage("Product successfully deleted") )
                                         .catchErrors()
                                         .handle<TError>({

@@ -1,3 +1,14 @@
+<script lang="ts">
+  import type { Product } from "../main/types";
+
+
+  let { currentProduct, handleDeleteProduct, closeDeleteModal } : {
+    currentProduct: Product | null,
+    handleDeleteProduct: () => void,
+    closeDeleteModal: () => void
+  } = $props();
+
+</script>
 <div
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
     onclick={closeDeleteModal}
@@ -19,7 +30,7 @@
 
       <div class="p-6">
         <div class="flex items-start gap-4 mb-6">
-          <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center flex-shrink-0">
+          <div class="w-10 h-10 rounded-full bg-red-100 text-red-600 flex items-center justify-center shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/><line x1="10" x2="10" y1="11" y2="17"/><line x1="14" x2="14" y1="11" y2="17"/>
             </svg>

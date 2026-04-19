@@ -10,7 +10,7 @@ import { dbq } from "#config/db";
 import ResponseMessage from "#services/response_message";
 
 const rules = type({
-    productId: 'string & string > 0',
+    product: 'string & string > 0',
     productName: 'string & string > 0',
     category: 'string & string > 0',
     price: 'number',
@@ -26,7 +26,7 @@ export default class UpdateProductFeature extends BaseFeature<TError, any> {
         return await UpdateProductFeature.use<typeof params, typeof params>(params)
                                         // .withAuth()
                                         .chain( (_, data) => ValidationService.validate({ rules, data }))
-                                        .chain( (_, data) => validateProduct( data.productId ) )
+                                        .chain( (_, data) => validateProduct( data.product ) )
                                         .chain( (_, data) => this.updateProduct(data) )
                                         .chain( (_,__) => ResponseMessage.successMessage("Product successfully updated"))
                                         .catchErrors()
@@ -46,7 +46,7 @@ export default class UpdateProductFeature extends BaseFeature<TError, any> {
                         price: opts.price,
                         quantity: opts.quantity
                      })
-                     .where("id", '=', opts.productId)
+                     .where("id", '=', opts.product)
                      .executeTakeFirst(),
             (err) => AppErrors.DBError(err, "There was an error updating this product")
         )

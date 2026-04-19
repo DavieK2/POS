@@ -91,4 +91,28 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['addProduct']>>>
     }
   }
+  'products.update_product': {
+    methods: ["PATCH"]
+    pattern: '/product/update/:product'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { product: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['updateProduct']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['updateProduct']>>>
+    }
+  }
+  'products.delete_product': {
+    methods: ["DELETE"]
+    pattern: '/product/delete/:product'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { product: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['deleteProduct']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['deleteProduct']>>>
+    }
+  }
 }

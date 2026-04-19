@@ -11,6 +11,8 @@ export type ScannedRoutes = {
     'category.delete_category': { paramsTuple: [ParamValue]; params: {'categoryId': ParamValue} }
     'products.get_products': { paramsTuple?: []; params?: {} }
     'products.add_product': { paramsTuple?: []; params?: {} }
+    'products.update_product': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
+    'products.delete_product': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
   }
   GET: {
     'category.get_categories': { paramsTuple?: []; params?: {} }
@@ -25,9 +27,11 @@ export type ScannedRoutes = {
   }
   PATCH: {
     'category.update_category': { paramsTuple: [ParamValue]; params: {'categoryId': ParamValue} }
+    'products.update_product': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
   }
   DELETE: {
     'category.delete_category': { paramsTuple: [ParamValue]; params: {'categoryId': ParamValue} }
+    'products.delete_product': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

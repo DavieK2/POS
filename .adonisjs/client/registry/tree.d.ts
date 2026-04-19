@@ -14,5 +14,7 @@ export interface ApiDefinition {
   products: {
     getProducts: typeof routes['products.get_products']
     addProduct: typeof routes['products.add_product']
+    updateProduct: typeof routes['products.update_product']
+    deleteProduct: typeof routes['products.delete_product']
   }
 }

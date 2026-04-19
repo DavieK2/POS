@@ -10,6 +10,7 @@
   import AddProductModal from "../components/AddProductModal.svelte";
   import Dropdown from "../../../shared/dropdown.svelte";
   import EditProductModal from "../components/EditProductModal.svelte";
+  import DeleteProductModal from "../components/DeleteProductModal.svelte";
   
   
 
@@ -71,42 +72,6 @@
       categoryOptions = res.flatMap( (category: Category) => [{ text: category.categoryName, value: category.id }] );      
   }
 
-  let formData = $state<ProductFormData>({
-      name: '',
-      category: '',
-      price: 0,
-      quantity: 0
-  });
-
-  
-
-  function openAddProductModal(): void {
-    formData = { name: '', category: '', price: 0, quantity: 0 };
-    addProductModalOpen = true;
-  }
-
-  function openEditProductModal(product: Product): void {
-
-    currentProduct = product;
-    
-    formData = {
-      name: product.productName,
-      price: product.price,
-      category: product.categoryId,
-      quantity: product.quantity,
-      image: product.productImage
-    };
-
-    console.log($state.snapshot(formData));
-    
-
-    editModalProductOpen = true;
-  }
-
-  function openDeleteModal(product: Product): void {
-    currentProduct = product;
-    deleteModalOpen = true;
-  }
 
   function openGenerateBarcodeModal(product: Product): void {
     currentProduct = product;
@@ -155,6 +120,40 @@
     currentCategory = null;
   }
 
+
+  let productFormData = $state<ProductFormData>({
+      name: '',
+      category: '',
+      price: 0,
+      quantity: 0
+  });
+
+
+  const openDeleteProductModal = (product: Product): void  => {
+    currentProduct = product;
+    deleteModalOpen = true;
+  }
+
+  const openAddProductModal = (): void => {
+    productFormData = { name: '', category: '', price: 0, quantity: 0 };
+    addProductModalOpen = true;
+  }
+
+  const openEditProductModal = (product: Product): void => {
+
+    currentProduct = product;
+    
+    productFormData = {
+      name: product.productName,
+      price: product.price,
+      category: product.categoryId,
+      quantity: product.quantity,
+      image: product.productImage
+    };
+
+    editModalProductOpen = true;
+  }
+
   const handleAddProduct =  async (e: Event): Promise<void> =>  {
       e.preventDefault();
 
@@ -162,11 +161,11 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-              productName: formData.name,
-              category: formData.category,
-              price: formData.price,
-              quantity: formData.quantity,
-              description: formData.description
+              productName: productFormData.name,
+              category: productFormData.category,
+              price: productFormData.price,
+              quantity: productFormData.quantity,
+              description: productFormData.description
           })
       });
 
@@ -180,35 +179,54 @@
       closeAddProductModal();
   }
 
-  // Handle form submission for edit product
-  function handleEditProduct(e: Event): void {
+  const handleEditProduct = async (e: Event): Promise<void> => {
+
     e.preventDefault();
 
-    console.log($state.snapshot(formData));
+    if (  !currentProduct ) return;
+
+    const req = await fetch(`${BASE_URL}/product/update/${currentProduct.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            productName: productFormData.name,
+            category: productFormData.category,
+            price: productFormData.price,
+            quantity: productFormData.quantity,
+            description: productFormData.description
+        })
+    });
+
+    const res = await req.json();
+
+    if( ! req.ok ) {
+      console.log(res);
+      return
+    } 
+
+    await getProducts();
     
-    // const index = products.findIndex(p => p.id === currentProduct?.id);
-    // if (index !== -1 && currentProduct) {
-    //   products[index] = {
-    //     ...products[index],
-    //     code: formData.code,
-    //     name: formData.name,
-    //     category: formData.category,
-    //     price: parseFloat(formData.price) || 0,
-    //     stock: parseInt(formData.stock) || 0
-    //   };
-    // }
-    // closeEditProductModal();
-    // TODO: Add API call here
+    closeEditProductModal();
   }
 
-  // Handle delete confirmation
-  function handleDeleteProduct(): void {
-    if (currentProduct) {
-      const id = currentProduct.id;
-      products = products.filter(p => p.id !== id);
+  const handleDeleteProduct = async (): Promise<void> => {
+
+    if (!currentProduct) return;
+
+    const req = await fetch(`${BASE_URL}/product/delete/${currentProduct.id}`, {
+        method: 'DELETE',
+    });
+
+    const res = await req.json();
+
+    if( ! req.ok ) {
+      console.log(res);
+      return
     }
+
+    await getProducts();
+
     closeDeleteModal();
-    // TODO: Add API call here
   }
 
   const handleAddCategory = async (e: Event): Promise<void> => {
@@ -563,7 +581,7 @@
                   </svg>
                 </button>
                 <button
-                  onclick={() => openDeleteModal(product)}
+                  onclick={() => openDeleteProductModal(product)}
                   class="p-1.5 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors focus:ring-2 focus:ring-red-400 focus:outline-none"
                   title="Delete"
                   aria-label="Delete {product.productName}"
@@ -618,17 +636,17 @@
 {/if}
 
 {#if addProductModalOpen}
-  <AddProductModal {categoryOptions} closeAddModal={closeAddProductModal} {handleAddProduct} bind:formData />
+  <AddProductModal {categoryOptions} closeAddModal={closeAddProductModal} {handleAddProduct} bind:formData={productFormData} />
 {/if}
 
 <!-- ======================== EDIT PRODUCT MODAL ======================== -->
 {#if editModalProductOpen}
-  <EditProductModal {categoryOptions} closeEditModal={closeEditProductModal} {handleEditProduct} bind:formData />
+  <EditProductModal {categoryOptions} closeEditModal={closeEditProductModal} {handleEditProduct} bind:formData={productFormData} />
 {/if}
 
 <!-- ======================== DELETE PRODUCT MODAL ======================== -->
 {#if deleteModalOpen}
-  <div></div>
+  <DeleteProductModal {currentProduct} {handleDeleteProduct} {closeDeleteModal} />
 {/if}
 
 <!-- ======================== GENERATE BARCODE MODAL ======================== -->

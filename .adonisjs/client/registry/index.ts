@@ -48,6 +48,18 @@ const routes = {
     tokens: [{"old":"/product","type":0,"val":"product","end":""}],
     types: placeholder as Registry['products.add_product']['types'],
   },
+  'products.update_product': {
+    methods: ["PATCH"],
+    pattern: '/product/update/:product',
+    tokens: [{"old":"/product/update/:product","type":0,"val":"product","end":""},{"old":"/product/update/:product","type":0,"val":"update","end":""},{"old":"/product/update/:product","type":1,"val":"product","end":""}],
+    types: placeholder as Registry['products.update_product']['types'],
+  },
+  'products.delete_product': {
+    methods: ["DELETE"],
+    pattern: '/product/delete/:product',
+    tokens: [{"old":"/product/delete/:product","type":0,"val":"product","end":""},{"old":"/product/delete/:product","type":0,"val":"delete","end":""},{"old":"/product/delete/:product","type":1,"val":"product","end":""}],
+    types: placeholder as Registry['products.delete_product']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }
