@@ -1,0 +1,19 @@
+@import "tailwindcss";
+
+@font-face {
+  font-family: 'Manrope';
+  src: url("./assets/fonts/Archivo-VariableFont.ttf");
+}
+
+.main-font {
+  font-family: "Manrope";
+}
+
+@font-face {
+  font-family: 'Inter';
+  src: url("./assets/fonts/Lexend-VariableFont_wght.ttf");
+}
+
+.font-inter {
+  font-family: "Inter";
+}

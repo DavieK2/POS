@@ -1,0 +1,19 @@
+import { DateTime } from 'luxon'
+import { BaseModel, beforeCreate, column } from '@adonisjs/lucid/orm'
+import { v7 } from 'uuid';
+
+export default class {{ class_name }} extends BaseModel {
+  @column({ isPrimary: true })
+  declare id: string
+
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+
+  @beforeCreate()
+  static async assignToken(model: {{ class_name }}) : Promise<void> {
+    model.id = v7();
+  }
+}
