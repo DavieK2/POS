@@ -1,3 +1,6 @@
+import AppErrors from '#exceptions/app_error';
+import pdfToPrinter from 'pdf-to-printer';
+import * as TE from 'fp-ts/lib/TaskEither.js';
 import fs from 'node:fs';
 import os from 'node:os';
 import path from "node:path";
@@ -15,3 +18,12 @@ import path from "node:path";
 
 // const TEMP_DIR = path.join(os.tmpdir(), 'pos-print-temp');
 // if (!fs.existsSync(TEMP_DIR)) fs.mkdirSync(TEMP_DIR, { recursive: true });
+
+export const getWindowsPrinters = () => {
+
+    return TE.tryCatch(
+        () => pdfToPrinter.getPrinters(),
+        (err) => AppErrors.HandledError(err, "Could not fetch printers")
+    )
+
+}

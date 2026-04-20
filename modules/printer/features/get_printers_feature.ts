@@ -1,12 +1,12 @@
-import AppErrors, { TError } from "#exceptions/app_error";
+import { TError } from "#exceptions/app_error";
 import * as E from 'fp-ts/lib/Either.js';
 import * as TE from 'fp-ts/lib/TaskEither.js';
 import BaseFeature from "../../../app/contracts/base_feature.js";
 import { Auth } from "#services/pipeline_builder";
 import { type } from "arktype";
 import os from "node:os"
-import pdfToPrinter from 'pdf-to-printer'
 import ResponseMessage from "#services/response_message";
+import { getWindowsPrinters } from "../tasks/printer_tasks.ts";
 
 const rules = type({});
 
@@ -20,7 +20,7 @@ export default class GetPrintersFeature extends BaseFeature<TError, any> {
                                         .chainWhenAndStore({
                                             'storeKey': 'printers',
                                             condition: (_,__) => os.platform() === 'win32',
-                                            action: (_,__) => this.getWindowsPrinters()
+                                            action: (_,__) => getWindowsPrinters()
                                         })
                                         .chainIfElse({
                                             condition: (_, data) => !! data.__printers,
@@ -32,14 +32,5 @@ export default class GetPrintersFeature extends BaseFeature<TError, any> {
                                             'Default': (err: TError) => TE.left(err),
                                         })
                                         .run();
-    }
-
-    getWindowsPrinters(){
-
-        return TE.tryCatch(
-            () => pdfToPrinter.getPrinters(),
-            (err) => AppErrors.HandledError(err, "Could not fetch printers")
-        )
-
     }
 }
