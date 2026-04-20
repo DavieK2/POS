@@ -85,7 +85,7 @@
   onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeAddModal(); }}
 >
   <div
-    class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in"
+    class="bg-white rounded-2xl shadow-2xl max-h-[95vh] w-full max-w-md overflow-hidden animate-scale-in"
     role="dialog"
     aria-modal="true"
     aria-labelledby="add-modal-title"
@@ -106,7 +106,7 @@
       </button>
     </div>
 
-    <form onsubmit={handleAddProduct} class="p-6 space-y-4">
+    <form onsubmit={handleAddProduct} class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
       <div>
         <label for="product-image" class="block text-sm font-medium text-neutral-700 mb-1">Product Image</label>
 

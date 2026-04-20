@@ -6,6 +6,7 @@ export type ScannedRoutes = {
   ALL: {
     'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'authentication.sign_in': { paramsTuple?: []; params?: {} }
+    'printer.get_printers': { paramsTuple?: []; params?: {} }
     'category.get_categories': { paramsTuple?: []; params?: {} }
     'category.add_category': { paramsTuple?: []; params?: {} }
     'category.update_category': { paramsTuple: [ParamValue]; params: {'categoryId': ParamValue} }
@@ -18,6 +19,7 @@ export type ScannedRoutes = {
   }
   GET: {
     'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
+    'printer.get_printers': { paramsTuple?: []; params?: {} }
     'category.get_categories': { paramsTuple?: []; params?: {} }
     'products.get_products': { paramsTuple?: []; params?: {} }
   }

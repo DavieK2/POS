@@ -6,6 +6,7 @@ import { Auth } from "#services/pipeline_builder";
 import { type } from "arktype";
 import os from "node:os"
 import pdfToPrinter from 'pdf-to-printer'
+import ResponseMessage from "#services/response_message";
 
 const rules = type({});
 
@@ -21,6 +22,11 @@ export default class GetPrintersFeature extends BaseFeature<TError, any> {
                                             condition: (_,__) => os.platform() === 'win32',
                                             action: (_,__) => this.getWindowsPrinters()
                                         })
+                                        .chainIfElse({
+                                            condition: (_, data) => !! data.__printers,
+                                            onFalse: () => ResponseMessage.successMessage("No printers found"),
+                                            onTrue: (_, data) => TE.right(data.__printers)
+                                        })
                                         .catchErrors()
                                         .handle<TError>({
                                             'Default': (err: TError) => TE.left(err),
@@ -32,7 +38,7 @@ export default class GetPrintersFeature extends BaseFeature<TError, any> {
 
         return TE.tryCatch(
             () => pdfToPrinter.getPrinters(),
-            (err) => AppErrors.HandledError(err, "Could not fectch printers")
+            (err) => AppErrors.HandledError(err, "Could not fetch printers")
         )
 
     }

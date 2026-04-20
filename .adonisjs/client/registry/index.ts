@@ -18,6 +18,12 @@ const routes = {
     tokens: [{"old":"/auth/login","type":0,"val":"auth","end":""},{"old":"/auth/login","type":0,"val":"login","end":""}],
     types: placeholder as Registry['authentication.sign_in']['types'],
   },
+  'printer.get_printers': {
+    methods: ["GET"],
+    pattern: '/printers',
+    tokens: [{"old":"/printers","type":0,"val":"printers","end":""}],
+    types: placeholder as Registry['printer.get_printers']['types'],
+  },
   'category.get_categories': {
     methods: ["GET"],
     pattern: '/categories',

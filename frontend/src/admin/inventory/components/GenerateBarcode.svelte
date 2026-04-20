@@ -81,7 +81,7 @@
     aria-hidden="true"
   >
     <div
-      class="bg-white rounded-2xl shadow-2xl w-full max-w-lg overflow-hidden animate-scale-in"
+      class="bg-white rounded-2xl shadow-2xl max-h-[95vh] w-full max-w-lg overflow-hidden animate-scale-in"
       role="dialog"
       aria-modal="true"
       aria-labelledby="generate-barcode-modal-title"
@@ -102,7 +102,7 @@
         </button>
       </div>
 
-      <div class="p-6">
+      <div class="p-6 max-h-[85vh] overflow-y-auto">
         <div class="mb-6">
           <p class="text-sm text-neutral-600 mb-1">Product</p>
           <p class="font-medium text-black">{currentProduct.productName}</p>

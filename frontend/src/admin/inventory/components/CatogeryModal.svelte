@@ -23,7 +23,7 @@
   aria-hidden="true"
 >
   <div
-    class="bg-white rounded-2xl shadow-[0_16px_40px_rgb(0,0,0,0.12)] w-full max-w-2xl overflow-hidden animate-scale-in flex flex-col max-h-[85vh]"
+    class="bg-white rounded-2xl shadow-[0_16px_40px_rgb(0,0,0,0.12)] w-full max-w-2xl overflow-hidden animate-scale-in flex flex-col max-h-[95vh]"
     role="dialog"
     aria-modal="true"
     aria-labelledby="manage-categories-title"
@@ -47,7 +47,7 @@
       </button>
     </div>
 
-    <div class="p-6 overflow-y-auto custom-scrollbar">
+    <div class="p-6 max-h-[75vh] overflow-y-auto custom-scrollbar">
       {#if categories.length === 0}
         <div class="text-center py-12 px-4 rounded-xl border border-dashed border-gray-200 bg-gray-50/50">
           <div class="inline-flex items-center justify-center w-12 h-12 rounded-full bg-white border border-gray-200 shadow-sm mb-4 text-gray-400">

@@ -31,6 +31,18 @@ export interface Registry {
       errorResponse: unknown
     }
   }
+  'printer.get_printers': {
+    methods: ["GET"]
+    pattern: '/printers'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/printer/controllers/printer_controller').default['getPrinters']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/printer/controllers/printer_controller').default['getPrinters']>>>
+    }
+  }
   'category.get_categories': {
     methods: ["GET"]
     pattern: '/categories'

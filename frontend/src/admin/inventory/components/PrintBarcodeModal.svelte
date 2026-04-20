@@ -3,6 +3,8 @@
   import Dropdown from "../../../shared/dropdown.svelte";
   // import { formatCurrency } from "../../../utils";
   import type { DropDownOptions, Product } from "../main/types";
+  import { BASE_URL } from "../../../utils";
+  import { showToast } from "../../../lib/toast";
 
   let {
     closePrintBarcodeModal,
@@ -19,15 +21,21 @@
     getPrinters();
   });
 
-  const getPrinters = (): DropDownOptions[] => {
-    printers = [
-      {
-        text: "HP LaserJet Pro M404n (Network)",
-        value: "HP LaserJet Pro M404n (Network)",
-      },
-    ];
+  const getPrinters = async (): Promise<void> => {
 
-    return printers;
+    const req = await fetch(`${BASE_URL}/printers`);
+
+    if( ! req.ok ){
+        const res = await req.json();
+        console.log(res);
+        showToast(res.message)
+        return;  
+    }
+
+    const res = await req.json();
+
+    printers = res.flatMap( (p : {deviceId: string, name: string }) => [{ text: p.name, value: p.deviceId }])
+
   };
 
   function handlePrintBarcode(): void {
@@ -47,7 +55,7 @@
   }}
   aria-hidden="true"
 >
-  <div class="bg-white rounded-2xl max-h-[80vh] shadow-2xl w-full max-w-md overflow-hidden animate-scale-in" role="dialog" aria-modal="true" aria-labelledby="print-barcode-modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
+  <div class="bg-white rounded-2xl max-h-[95vh] shadow-2xl w-full max-w-md overflow-hidden animate-scale-in" role="dialog" aria-modal="true" aria-labelledby="print-barcode-modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
     <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
       <h2 id="print-barcode-modal-title" class="text-lg font-semibold text-black">Print Barcode Labels</h2>
       <button onclick={closePrintBarcodeModal} class="p-2 text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-lg transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none" aria-label="Close modal">
@@ -57,7 +65,7 @@
       </button>
     </div>
 
-    <div class="w-full h-[60vh] overflow-y-auto">
+    <div class="w-full max-h-[75vh] overflow-y-auto">
          <form
       onsubmit={(e) => {
         e.preventDefault();

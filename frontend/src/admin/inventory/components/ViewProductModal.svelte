@@ -15,13 +15,13 @@
     aria-hidden="true"
   >
     <div
-      class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in"
+      class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in max-h-[95vh]"
       role="dialog"
       aria-modal="true"
       aria-labelledby="view-barcode-modal-title"
       tabindex="-1"
-      onclick={(e) => e.stopPropagation()}
-      onkeydown={(e) => e.stopPropagation()}
+      onclick={ (e) => e.stopPropagation() }
+      onkeydown={ (e) => e.stopPropagation() }
     >
       <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
         <h2 id="view-barcode-modal-title" class="text-lg font-semibold text-black">Product Details</h2>
@@ -36,10 +36,10 @@
         </button>
       </div>
 
-      <div class="p-6">
+      <div class="p-6 max-h-[80vh] w-full overflow-y-auto">
         <!-- Product header -->
         <div class="flex items-start gap-4 mb-6 pb-6 border-b border-neutral-100">
-          <div class="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center flex-shrink-0">
+          <div class="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center shrink-0">
             <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-neutral-600">
               <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" x2="7.01" y1="7" y2="7"/>
             </svg>

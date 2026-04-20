@@ -10,6 +10,9 @@ export interface ApiDefinition {
   authentication: {
     signIn: typeof routes['authentication.sign_in']
   }
+  printer: {
+    getPrinters: typeof routes['printer.get_printers']
+  }
   category: {
     getCategories: typeof routes['category.get_categories']
     addCategory: typeof routes['category.add_category']
