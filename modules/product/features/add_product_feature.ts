@@ -10,7 +10,7 @@ import ResponseMessage from "#services/response_message";
 import { v7 } from "uuid";
 import { ControlledTransaction } from "kysely";
 import { DB } from "#database/db_shema";
-import ImageUpload, { ValidatedImage } from "#services/image_upload";
+import { uploadImage, validateImage } from "../tasks/product_tasks.ts";
 
 const rules = type({
     productName: 'string & string > 0',
@@ -33,12 +33,12 @@ export default class AddProductFeature extends BaseFeature<TError, any> {
                                         .chainWhenAndStore({
                                             storeKey: 'validatedImage',
                                             condition: (_, data) => !!data.image,
-                                            action : ( _, data ) => this.validateImage( data.image! ),
+                                            action : ( _, data ) => validateImage( data.image! ),
                                         })
                                         .chainWhenAndStore({
                                             storeKey: 'imageUrl',
                                             condition: (_, data) => !!data.image,
-                                            action : ( _, data ) => this.uploadImage( data.__validatedImage! )
+                                            action : ( _, data ) => uploadImage( data.__validatedImage! )
                                         })
                                         .chain((_, data) => this.addNewProduct({
                                             ...data,
@@ -52,20 +52,6 @@ export default class AddProductFeature extends BaseFeature<TError, any> {
                                             'Default': (err: TError) => TE.left(err),
                                         })
                                         .run();
-    }
-
-    validateImage( image: string ) {
-        return E.tryCatch(
-            () => ImageUpload.validateBase64Image(image),
-            () => AppErrors.ValidationErrorMessage("The provided image is not valid")
-        )
-    }
-
-    uploadImage( image: ValidatedImage ) {
-        return TE.tryCatch(
-            () => ImageUpload.save( image, 'products' ),
-            (err) => AppErrors.UnhandledError(err, "There was an error uploading the product image")
-        )
     }
 
     addNewProduct = ( opts: ParamsType & { dbTransaction: ControlledTransaction<DB, []>  }) => {

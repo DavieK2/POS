@@ -5,6 +5,7 @@ import BaseFeature from "../../../app/contracts/base_feature.js";
 import { Auth } from "#services/pipeline_builder";
 import { type } from "arktype";
 import { dbq } from "#config/db";
+import { sql } from "kysely";
 
 const rules = type({});
 
@@ -28,6 +29,7 @@ export default class GetProductsFeature extends BaseFeature<TError, any> {
             () => dbq.selectFrom("products")
                      .leftJoin("categories", "products.categoryId", "categories.id")
                      .selectAll('products')
+                     .select(() => sql<string>`${process.env.APP_URL} || products.product_image`.as('productImage') )
                      .select("categories.categoryName as category")
                      .execute(),
             (err) => AppErrors.DBError(err, "There was an error fetching products")

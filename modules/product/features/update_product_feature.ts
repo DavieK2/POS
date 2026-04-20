@@ -5,7 +5,7 @@ import BaseFeature from "../../../app/contracts/base_feature.js";
 import { Auth } from "#services/pipeline_builder";
 import { type } from "arktype";
 import ValidationService from "#services/validation_services";
-import { validateProduct } from "../tasks/product_tasks.ts";
+import { uploadImage, validateImage, validateProduct } from "../tasks/product_tasks.ts";
 import { dbq } from "#config/db";
 import ResponseMessage from "#services/response_message";
 
@@ -28,7 +28,17 @@ export default class UpdateProductFeature extends BaseFeature<TError, any> {
                                         // .withAuth()
                                         .chain( (_, data) => ValidationService.validate({ rules, data }))
                                         .chain( (_, data) => validateProduct( data.product ) )
-                                        .chain( (_, data) => this.updateProduct(data) )
+                                        .chainWhenAndStore({
+                                            storeKey: 'validatedImage',
+                                            condition: (_, data) => !!data.image,
+                                            action : ( _, data ) => validateImage( data.image! ),
+                                        })
+                                        .chainWhenAndStore({
+                                            storeKey: 'imageUrl',
+                                            condition: (_, data) => !!data.image,
+                                            action : ( _, data ) => uploadImage( data.__validatedImage! )
+                                        })
+                                        .chain( (_, data) => this.updateProduct( { ...data, image: data.__imageUrl } ) )
                                         .chain( (_,__) => ResponseMessage.successMessage("Product successfully updated"))
                                         .catchErrors()
                                         .handle<TError>({
@@ -36,6 +46,7 @@ export default class UpdateProductFeature extends BaseFeature<TError, any> {
                                         })
                                         .run();
     }
+
 
     updateProduct( opts : ParamsType ) {
         return TE.tryCatch(
@@ -45,7 +56,8 @@ export default class UpdateProductFeature extends BaseFeature<TError, any> {
                         description: opts.description,
                         productName: opts.productName,
                         price: opts.price,
-                        quantity: opts.quantity
+                        quantity: opts.quantity,
+                        productImage: opts.image
                      })
                      .where("id", '=', opts.product)
                      .executeTakeFirst(),
