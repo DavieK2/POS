@@ -12,6 +12,7 @@ export interface ApiDefinition {
   }
   printer: {
     getPrinters: typeof routes['printer.get_printers']
+    printBarcode: typeof routes['printer.print_barcode']
   }
   category: {
     getCategories: typeof routes['category.get_categories']

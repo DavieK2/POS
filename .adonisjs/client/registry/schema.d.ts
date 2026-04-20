@@ -43,6 +43,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/printer/controllers/printer_controller').default['getPrinters']>>>
     }
   }
+  'printer.print_barcode': {
+    methods: ["POST"]
+    pattern: '/print/barcode/:product'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { product: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/printer/controllers/printer_controller').default['printBarcode']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/printer/controllers/printer_controller').default['printBarcode']>>>
+    }
+  }
   'category.get_categories': {
     methods: ["GET"]
     pattern: '/categories'

@@ -19,7 +19,7 @@ export const validateCategory = ( categoryId: string ) => {
 
 export const validateProduct = ( productId: string ) => {
     return validateExists( {
-        queryFn: () => dbq.selectFrom("products").select('products.id').where("products.id", '=', productId ).executeTakeFirst(),
+        queryFn: () => dbq.selectFrom("products").select('products.id').select('products.barcode').where("products.id", '=', productId ).executeTakeFirst(),
         dbErrorMessage: "There was an error retrieving this product",
         notFoundErrorMessage: "This product is not valid"
     })

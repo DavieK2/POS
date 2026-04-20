@@ -24,6 +24,12 @@ const routes = {
     tokens: [{"old":"/printers","type":0,"val":"printers","end":""}],
     types: placeholder as Registry['printer.get_printers']['types'],
   },
+  'printer.print_barcode': {
+    methods: ["POST"],
+    pattern: '/print/barcode/:product',
+    tokens: [{"old":"/print/barcode/:product","type":0,"val":"print","end":""},{"old":"/print/barcode/:product","type":0,"val":"barcode","end":""},{"old":"/print/barcode/:product","type":1,"val":"product","end":""}],
+    types: placeholder as Registry['printer.print_barcode']['types'],
+  },
   'category.get_categories': {
     methods: ["GET"],
     pattern: '/categories',

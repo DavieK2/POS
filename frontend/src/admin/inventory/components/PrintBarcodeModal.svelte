@@ -16,6 +16,7 @@
 
   let printers: DropDownOptions[] = $state([]);
   let printQuantity = $state(1);
+  let selectedPrinter = $state("")
 
   onMount(() => {
     getPrinters();
@@ -38,12 +39,24 @@
 
   };
 
-  function handlePrintBarcode(): void {
-    // if (!currentProduct) return;
-    // const product = currentProduct;
-    // console.log(`Printing ${printQuantity} barcode(s) for product: ${product.name}`);
-    // alert(`Printing ${printQuantity} barcode label(s) for "${product.name}"`);
-    closePrintBarcodeModal();
+  const handlePrintBarcode = async(): Promise<void> => {
+    if (!currentProduct) return;
+
+    const req : Response  = await fetch(`${BASE_URL}/print/barcode/${currentProduct.id}`, {
+        method: "POST",
+        headers: {
+          "Content-Type" : 'application/json'
+        },
+        body: JSON.stringify({
+            printer: selectedPrinter
+        })
+    })
+
+    const res = await req.json();
+   
+    console.log(res);
+    
+    // closePrintBarcodeModal();
   }
 </script>
 
@@ -124,7 +137,7 @@
 
       <div class="space-y-4">
         <label for="receipt" class="text-sm font-semibold text-neutral-700">Select Printer</label>
-        <Dropdown selected={printers[0] || { text: "Select a printer", value: "" }} options={printers} />
+        <Dropdown selected={printers[0] || { text: "Select a printer", value: "" }} options={printers} onSelect={ (option) => selectedPrinter = option.value } />
       </div>
 
       <!-- Print settings -->

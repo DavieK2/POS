@@ -1,9 +1,9 @@
 import AppErrors from '#exceptions/app_error';
 import pdfToPrinter from 'pdf-to-printer';
 import * as TE from 'fp-ts/lib/TaskEither.js';
-import fs from 'node:fs';
-import os from 'node:os';
-import path from "node:path";
+// import fs from 'node:fs';
+// import os from 'node:os';
+// import path from "node:path";
 // import vfsFonts from 'pdfmake/build/'
 
 // const fonts = {

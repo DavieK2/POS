@@ -7,6 +7,7 @@ export type ScannedRoutes = {
     'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'authentication.sign_in': { paramsTuple?: []; params?: {} }
     'printer.get_printers': { paramsTuple?: []; params?: {} }
+    'printer.print_barcode': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
     'category.get_categories': { paramsTuple?: []; params?: {} }
     'category.add_category': { paramsTuple?: []; params?: {} }
     'category.update_category': { paramsTuple: [ParamValue]; params: {'categoryId': ParamValue} }
@@ -28,6 +29,7 @@ export type ScannedRoutes = {
   }
   POST: {
     'authentication.sign_in': { paramsTuple?: []; params?: {} }
+    'printer.print_barcode': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
     'category.add_category': { paramsTuple?: []; params?: {} }
     'products.add_product': { paramsTuple?: []; params?: {} }
     'products.generate_product_barcode': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
