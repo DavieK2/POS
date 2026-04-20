@@ -177,6 +177,12 @@
     closeDeleteCategoryModal()
   }
 
+  const onBarcodeGenerated = async ( e: { message: string }) : Promise<void> => {
+    showToast(e.message)
+    await getProducts()
+    closeGenerateBarcodeModal()
+  }
+
   // Handle print barcode
   function handlePrintBarcode(): void {
     // if (!currentProduct) return;
@@ -444,7 +450,7 @@
 
 <!-- ======================== GENERATE BARCODE MODAL ======================== -->
 {#if generateBarcodeModalOpen && currentProduct}
-  <GenerateBarcode {currentProduct} {closeGenerateBarcodeModal} />
+  <GenerateBarcode {currentProduct} {closeGenerateBarcodeModal} {onBarcodeGenerated} />
 {/if}
 
 <!-- ======================== VIEW PRODUCT DETAILS MODAL ======================== -->

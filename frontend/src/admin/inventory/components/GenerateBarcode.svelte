@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { showToast } from "../../../lib/toast";
   import { BASE_URL } from "../../../utils";
   import type { Product } from "../main/types";
 
@@ -9,8 +10,9 @@
         productPrice?: number;
     }
  
-    let { currentProduct, closeGenerateBarcodeModal } : {
+    let { currentProduct, onBarcodeGenerated, closeGenerateBarcodeModal } : {
         currentProduct: Product,
+        onBarcodeGenerated : (e: { message: string }) => void
         closeGenerateBarcodeModal : () => void
     } = $props()
 
@@ -44,7 +46,7 @@
     //     price: scanData.productPrice || products[index].price
     //   };
     // }
-    closeGenerateBarcodeModal();
+    // closeGenerateBarcodeModal();
   }
 
   const handleGenerateBarcodeManually = async () : Promise<void> => {
@@ -58,15 +60,15 @@
 
     if( ! req.ok ){
 
-      console.log( req.json() );
+      const res = await req.json();
+      console.log( res );
+      showToast(res.message)
       return;
 
     }
     const res = await req.json();
 
-    console.log( res );
-
-    closeGenerateBarcodeModal();
+    onBarcodeGenerated({ message: res.message })
   }
 
 
