@@ -16,7 +16,8 @@ const rules = type({
     category: 'string & string > 0',
     price: 'number',
     quantity: type('number').optional(),
-    description: type('string').optional()
+    description: type('string').optional(),
+    image: type('string').optional()
 });
 
 type ParamsType = typeof rules.infer

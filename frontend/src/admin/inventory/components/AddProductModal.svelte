@@ -14,7 +14,7 @@
   let fileInput: HTMLInputElement;
 
   function handleImageFile(file: File) {
-    if (!file.type.startsWith("image/")) return;
+    if ( !file.type.startsWith("image/") ) return;
     const reader = new FileReader();
     reader.onload = (e) => {
       const base64 = e.target?.result as string;
