@@ -33,7 +33,7 @@ export default class GenerateBarcodeFeature extends BaseFeature<TError, any> {
                                                 barcode: data.__barcode,
                                                 barcodePath: data.__uploadPath
                                             }))
-                                            .chain((_,__) => ResponseMessage.successMessage("Barcode successfully generated") )
+                                            .chain( (_,__) => ResponseMessage.successMessage("Barcode successfully generated") )
                                             .catchErrors()
                                             .handle<TError>({
                                                 'Default': (err: TError) => TE.left(err),
