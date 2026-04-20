@@ -78,10 +78,12 @@ export default class GenerateBarcodeFeature extends BaseFeature<TError, any> {
     uploadBarcodeImage( image: string ){
 
         return pipe(
-            validateImage(image),
-            uploadImage
+            TE.fromEither( validateImage(image) ),
+            TE.flatMap( validatedImage => uploadImage(validatedImage, 'products') )
         )
     }
+
+    
 
 
 }
