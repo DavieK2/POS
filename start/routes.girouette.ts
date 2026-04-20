@@ -17,6 +17,7 @@ await girouette.controllers([
   () => import('#modules/auth/controllers/authentication_controller'),
   () => import('#modules/product/controllers/category_controller'),
   () => import('#modules/product/controllers/products_controller'),
+  () => import('#modules/printer/controllers/printer_controller'),
 ])
 
 girouette.hmr(app.makePath('./modules'))

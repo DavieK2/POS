@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getContext, onMount } from "svelte";
+  import { onMount } from "svelte";
   import Layout from "../../layouts/Layout.svelte";
   import type { Category, DropDownOptions, Product, ProductFormData } from "./types";
   import CatogeryModal from "../components/CatogeryModal.svelte";
@@ -14,6 +14,7 @@
   import GenerateBarcode from "../components/GenerateBarcode.svelte";
   import ViewProductModal from "../components/ViewProductModal.svelte";
   import { showToast } from "../../../lib/toast";
+  import PrintBarcodeModal from "../components/PrintBarcodeModal.svelte";
   
   
 
@@ -38,8 +39,6 @@
   let manageCategoriesModalOpen = $state(false);
   let editCategoryModalOpen = $state(false);
   let deleteCategoryModalOpen = $state(false);
-  let editCategoryName = $state('');
-  let newCategoryName = $state('');
 
 
   let products = $state<Product[]>([]);
@@ -68,8 +67,6 @@
 
   function openGenerateBarcodeModal(product: Product): void {
     currentProduct = product;
-    // barcodeGenerationMode = 'manual';
-    // scannedBarcodeData = null;
     generateBarcodeModalOpen = true;
   }
 
@@ -85,7 +82,6 @@
   }
 
   function openAddCategoryModal(): void {
-    newCategoryName = '';
     addCategoryModalOpen = true;
   }
 
@@ -105,7 +101,6 @@
   function closeEditCategoryModal(): void { 
     editCategoryModalOpen = false;
     currentCategory = null;
-    editCategoryName = '';
   }
 
   function closeDeleteCategoryModal(): void { 
@@ -183,16 +178,7 @@
     closeGenerateBarcodeModal()
   }
 
-  // Handle print barcode
-  function handlePrintBarcode(): void {
-    // if (!currentProduct) return;
-    // const product = currentProduct;
-    // console.log(`Printing ${printQuantity} barcode(s) for product: ${product.name}`);
-    // alert(`Printing ${printQuantity} barcode label(s) for "${product.name}"`);
-    closePrintBarcodeModal();
-  }
 
-  // Close modal on Escape key
   function handleKeydown(e: KeyboardEvent): void {
     if (e.key === 'Escape') {
       if (addProductModalOpen) closeAddProductModal();
@@ -209,7 +195,6 @@
   }
 
 
-  // Prevent background scroll when modal is open
   $effect(() => {
     const isModalOpen = addProductModalOpen || editModalProductOpen || deleteModalOpen ||
                        generateBarcodeModalOpen || viewProductDetailsModalOpen || printBarcodeModalOpen ||
@@ -460,7 +445,7 @@
 
 <!-- ======================== PRINT BARCODE MODAL ======================== -->
 {#if printBarcodeModalOpen && currentProduct?.barcode}
- 
+  <PrintBarcodeModal {closePrintBarcodeModal} {currentProduct}  />
 {/if}
 </Layout>
 

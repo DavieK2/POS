@@ -9,42 +9,8 @@
 
 import router from '@adonisjs/core/services/router'
 import AuthenticationController from '#modules/auth/controllers/authentication_controller'
-import { createCanvas } from 'canvas';
-import JSBarcode from 'jsbarcode';
 
-router.get('/', async () => {
-
-     
-        const canvas = createCanvas(200, 100);
-        const ctx = canvas.getContext('2d');
-
-        // Background
-        ctx.fillStyle = '#fff';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Barcode
-        JSBarcode(canvas, '123456789012', {
-            format: 'EAN13',
-            displayValue: true,
-            fontSize: 18,
-            margin: 10
-        });
-
-        // return canvas.toDataURL('image/png');
-
-    // const canvas = new Canvas(600, 600);
-    // JSBarcode(canvas, '123456789012', {
-    //     format: 'EAN13',
-    //     displayValue: true,
-    //     fontSize: 18,
-    //     height: 100,
-    //     width: 2,
-    //     margin: 10
-    // });
-
-    // const buffer = canvas.toDataURL('image/png');
-    return '<img src="' + canvas.toDataURL('image/png') + '" alt="Generated Barcode" />';  
-})
+router.get('/', async () => {})
 
 router.post('/auth/login', [AuthenticationController, 'signIn']);
 

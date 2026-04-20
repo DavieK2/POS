@@ -80,6 +80,8 @@
     "jsbarcode": "^3.12.3",
     "kysely": "^0.28.16",
     "luxon": "^3.7.2",
+    "pdf-to-printer": "^5.7.0",
+    "pdfmake": "^0.3.7",
     "reflect-metadata": "^0.2.2",
     "uuid": "^13.0.0",
     "uuidv7": "^1.0.2"
