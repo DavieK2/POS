@@ -1,26 +1,28 @@
 <script lang="ts">
-  import { onMount } from "svelte";
+  import { getContext, onMount } from "svelte";
   import Layout from "../../layouts/Layout.svelte";
   import type { Category, DropDownOptions, Product, ProductFormData } from "./types";
   import CatogeryModal from "../components/CatogeryModal.svelte";
   import EditCategoryModal from "../components/EditCategoryModal.svelte";
-  import { BASE_URL } from "../../../utils";
+  import { BASE_URL, formatCurrency } from "../../../utils";
   import DeleteCategoryModal from "../components/DeleteCategoryModal.svelte";
   import AddCategoryModal from "../components/AddCategoryModal.svelte";
   import AddProductModal from "../components/AddProductModal.svelte";
   import Dropdown from "../../../shared/dropdown.svelte";
   import EditProductModal from "../components/EditProductModal.svelte";
   import DeleteProductModal from "../components/DeleteProductModal.svelte";
+  import GenerateBarcode from "../components/GenerateBarcode.svelte";
+  import ViewProductModal from "../components/ViewProductModal.svelte";
+  import { showToast } from "../../../lib/toast";
   
   
-
 
 
   let addProductModalOpen = $state(false);
   let editModalProductOpen = $state(false);
   let deleteModalOpen = $state(false);
   let generateBarcodeModalOpen = $state(false);
-  let viewBarcodeModalOpen = $state(false);
+  let viewProductDetailsModalOpen = $state(false);
   let printBarcodeModalOpen = $state(false);
   
 
@@ -73,7 +75,7 @@
 
   function openViewBarcodeModal(product: Product): void {
     currentProduct = product;
-    viewBarcodeModalOpen = true;
+    viewProductDetailsModalOpen = true;
   }
 
   function openPrintBarcodeModal(product: Product): void {
@@ -92,11 +94,11 @@
   }
 
   // Close modals
-  function closeAddProductModal(): void { addProductModalOpen = false; }
+  function closeAddProductModal(): void { addProductModalOpen = false }
   function closeEditProductModal(): void { editModalProductOpen = false; }
-  function closeDeleteModal(): void { deleteModalOpen = false; }
+  function closeDeleteProductModal(): void { deleteModalOpen = false; }
   function closeGenerateBarcodeModal(): void { generateBarcodeModalOpen = false; }
-  function closeViewBarcodeModal(): void { viewBarcodeModalOpen = false; }
+  function closeViewProductModal(): void { viewProductDetailsModalOpen = false; }
   function closePrintBarcodeModal(): void { printBarcodeModalOpen = false; }
   function closeAddCategoryModal(): void { addCategoryModalOpen = false; }
   function closeManageCategoriesModal(): void { manageCategoriesModalOpen = false; }
@@ -112,142 +114,41 @@
   }
 
 
-  let productFormData = $state<ProductFormData>({
-      name: '',
-      category: '',
-      price: 0,
-      quantity: 0
-  });
-
-
   const openDeleteProductModal = (product: Product): void  => {
     currentProduct = product;
     deleteModalOpen = true;
   }
 
   const openAddProductModal = (): void => {
-    productFormData = { name: '', category: '', price: 0, quantity: 0 };
     addProductModalOpen = true;
   }
 
   const openEditProductModal = (product: Product): void => {
-
     currentProduct = product;
-    
-    productFormData = {
-      name: product.productName,
-      price: product.price,
-      category: product.categoryId,
-      quantity: product.quantity,
-      image: product.productImage
-    };
-
     editModalProductOpen = true;
   }
 
-  const handleAddProduct =  async (e: Event): Promise<void> =>  {
-      e.preventDefault();
-
-      const req = await fetch(`${BASE_URL}/product`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-              productName: productFormData.name,
-              category: productFormData.category,
-              price: productFormData.price,
-              quantity: productFormData.quantity,
-              description: productFormData.description,
-              image: productFormData.image
-          })
-      });
-
-      if( ! req.ok ) {
-        const res = await req.json()
-        console.log(res)
-      }
-
-      await getProducts();
-
-      closeAddProductModal();
-  }
-
-  const handleEditProduct = async (e: Event): Promise<void> => {
-
-    e.preventDefault();
-
-    if (  !currentProduct ) return;
-
-    const req = await fetch(`${BASE_URL}/product/update/${currentProduct.id}`, {
-        method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-            productName: productFormData.name,
-            category: productFormData.category,
-            price: productFormData.price,
-            quantity: productFormData.quantity,
-            description: productFormData.description,
-            image: productFormData.image
-        })
-    });
-
-    const res = await req.json();
-
-    if( ! req.ok ) {
-      console.log(res);
-      return
-    } 
-
+ const onProductAdded = async ( e: { message: string }) : Promise<void> => {
+    showToast(e.message)
     await getProducts();
-    
-    closeEditProductModal();
-  }
+    closeAddProductModal()
 
-  const handleDeleteProduct = async (): Promise<void> => {
+ }
 
-    if (!currentProduct) return;
-
-    const req = await fetch(`${BASE_URL}/product/delete/${currentProduct.id}`, {
-        method: 'DELETE',
-    });
-
-    const res = await req.json();
-
-    if( ! req.ok ) {
-      console.log(res);
-      return
-    }
-
-    await getProducts();
-
-    closeDeleteModal();
-  }
-
-  const handleAddCategory = async (e: Event): Promise<void> => {
-
-    e.preventDefault();
-
-    const categoryName = newCategoryName.trim();
-
-    const req = await fetch(`${BASE_URL}/category`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ categoryName: categoryName })
-    });
-
-    if( ! req.ok ) {
-      const res = await req.json()
-      console.log(res)
-    }
-
-    await getCategories()
-    
-    closeAddCategoryModal();
-    openManageCategoriesModal();
-  }
-
+ const onProductEdited = async ( e: { message: string }) : Promise<void> => {
+    showToast(e.message)
+    await getProducts()
+    closeEditProductModal()
+ }
+  
+ const onProductDeleted = async ( e: { message: string }) : Promise<void> => {
+    showToast(e.message)
+    await getProducts()
+    closeDeleteProductModal()
+ }
+ 
   const openEditCategoryModal = (category: Category): void => {
     currentCategory = category;
-    editCategoryName = category.categoryName;    
     editCategoryModalOpen = true;
   }
 
@@ -256,56 +157,25 @@
     deleteCategoryModalOpen = true;
   }
 
-  const handleEditCategory = async (e: Event): Promise<void> => {
-
-      e.preventDefault();
-
-      console.log(editCategoryName);
-      
-
-      if (!currentCategory || ! editCategoryName.trim()) return;
-      
-      const newName = editCategoryName.trim();
-      
-      if ( categories.flatMap((c) => c.categoryName).includes(newName) ) {
-        closeEditCategoryModal();
-        return;
-      }
-    
-      const req = await fetch(`${BASE_URL}/category/update/${currentCategory.id}`, {
-          method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ categoryName: newName })
-      });
-
-      if( ! req.ok ) {
-        const res = await req.json()
-        console.log(res)
-      }
-
-      await getCategories()
-    
-      closeEditCategoryModal();
-  }
-
-  const handleDeleteCategory = async (): Promise<void> => {
-    if (! currentCategory) return;
-
-    const req = await fetch(`${BASE_URL}/category/delete/${currentCategory.id}`, {
-        method: 'DELETE',
-    });
-
-    if( ! req.ok ) {
-      const res = await req.json()
-      console.log(res)
-    }
-    
+  const onCategoryAdded = async ( e: { message: string }) : Promise<void> => {
+    showToast(e.message)
     await getCategories()
-
-    closeDeleteCategoryModal();
+    closeAddCategoryModal()
+    openManageCategoriesModal()
   }
 
+  const onCategoryEdited = async ( e: { message: string }) : Promise<void> => {
+    showToast(e.message)
+    await getCategories()
+    closeEditCategoryModal()
+    openManageCategoriesModal()
+  }
 
+  const onCategoryDeleted = async ( e: { message: string }) : Promise<void> => {
+    showToast(e.message)
+    await getCategories()
+    closeDeleteCategoryModal()
+  }
 
   // Handle print barcode
   function handlePrintBarcode(): void {
@@ -321,9 +191,9 @@
     if (e.key === 'Escape') {
       if (addProductModalOpen) closeAddProductModal();
       if (editModalProductOpen) closeEditProductModal();
-      if (deleteModalOpen) closeDeleteModal();
+      if (deleteModalOpen) closeDeleteProductModal();
       if (generateBarcodeModalOpen) closeGenerateBarcodeModal();
-      if (viewBarcodeModalOpen) closeViewBarcodeModal();
+      if (viewProductDetailsModalOpen) closeViewProductModal();
       if (printBarcodeModalOpen) closePrintBarcodeModal();
       if (addCategoryModalOpen) closeAddCategoryModal();
       if (manageCategoriesModalOpen) closeManageCategoriesModal();
@@ -332,10 +202,11 @@
     }
   }
 
+
   // Prevent background scroll when modal is open
   $effect(() => {
     const isModalOpen = addProductModalOpen || editModalProductOpen || deleteModalOpen ||
-                       generateBarcodeModalOpen || viewBarcodeModalOpen || printBarcodeModalOpen ||
+                       generateBarcodeModalOpen || viewProductDetailsModalOpen || printBarcodeModalOpen ||
                        addCategoryModalOpen || manageCategoriesModalOpen || 
                        editCategoryModalOpen || deleteCategoryModalOpen;
 
@@ -348,14 +219,10 @@
       };
     }
   });
-
-  // Helper to format currency
-  function formatCurrency(amount: number): string {
-    return amount.toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
-  }
-
  
 </script>
+
+
 
 <Layout>
   <div class="p-4 md:p-8 max-w-7xl mx-auto fade-in">
@@ -452,21 +319,22 @@
             <td class="px-4 md:px-6 py-4">
               <div class="flex items-center justify-end gap-0.5">
 
-                <!-- Generate barcode: barcode scan icon -->
-                <button
-                  onclick={() => openGenerateBarcodeModal(product)}
-                  class="p-1.5 text-neutral-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors focus:ring-2 focus:ring-blue-400 focus:outline-none"
-                  title="Generate Barcode"
-                  aria-label="Generate barcode for {product.productName}"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M2 6h.01"/><path d="M6 2v.01"/><path d="M2 10h.01"/><path d="M2 14h.01"/><path d="M2 18h.01"/>
-                    <rect x="6" y="6" width="2" height="12" rx="0.5"/>
-                    <rect x="11" y="6" width="1" height="12" rx="0.5"/>
-                    <rect x="15" y="6" width="3" height="12" rx="0.5"/>
-                    <path d="M22 6h.01"/><path d="M18 2v.01"/><path d="M22 10h.01"/><path d="M22 14h.01"/><path d="M22 18h.01"/>
-                  </svg>
-                </button>
+                {#if ! product.barcode}
+                  <button
+                    onclick={() => openGenerateBarcodeModal(product)}
+                    class="p-1.5 text-neutral-400 hover:text-blue-600 hover:bg-blue-50 rounded-lg transition-colors focus:ring-2 focus:ring-blue-400 focus:outline-none"
+                    title="Generate Barcode"
+                    aria-label="Generate barcode for {product.productName}"
+                  >
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M2 6h.01"/><path d="M6 2v.01"/><path d="M2 10h.01"/><path d="M2 14h.01"/><path d="M2 18h.01"/>
+                      <rect x="6" y="6" width="2" height="12" rx="0.5"/>
+                      <rect x="11" y="6" width="1" height="12" rx="0.5"/>
+                      <rect x="15" y="6" width="3" height="12" rx="0.5"/>
+                      <path d="M22 6h.01"/><path d="M18 2v.01"/><path d="M22 10h.01"/><path d="M22 14h.01"/><path d="M22 18h.01"/>
+                    </svg>
+                  </button>
+                {/if}              
 
                 <!-- View product: clipboard/info icon -->
                 <button
@@ -542,7 +410,7 @@
 
 <!-- ======================== ADD CATEGORY MODAL ======================== -->
 {#if addCategoryModalOpen}
-  <AddCategoryModal bind:newCategoryName {handleAddCategory} {closeAddCategoryModal} {openManageCategoriesModal} />
+  <AddCategoryModal {onCategoryAdded} {closeAddCategoryModal} {openManageCategoriesModal} />
 {/if}
 
 <!-- ======================== MANAGE CATEGORIES MODAL ======================== -->
@@ -552,290 +420,41 @@
 
 <!-- ======================== EDIT CATEGORY MODAL ======================== -->
 {#if editCategoryModalOpen && currentCategory}
-  <EditCategoryModal bind:editCategoryName {handleEditCategory} {closeEditCategoryModal} />
+  <EditCategoryModal {currentCategory} {closeEditCategoryModal} {onCategoryEdited} {categories} />
 {/if}
 
 <!-- ======================== DELETE CATEGORY MODAL ======================== -->
 {#if deleteCategoryModalOpen && currentCategory}
-  <DeleteCategoryModal {currentCategory} {handleDeleteCategory} {closeDeleteCategoryModal} />
+  <DeleteCategoryModal {currentCategory} {onCategoryDeleted} {closeDeleteCategoryModal} />
 {/if}
 
 {#if addProductModalOpen}
-  <AddProductModal {categoryOptions} closeAddModal={closeAddProductModal} {handleAddProduct} bind:formData={productFormData} />
+  <AddProductModal {categoryOptions} closeAddModal={closeAddProductModal} {onProductAdded}  />
 {/if}
 
 <!-- ======================== EDIT PRODUCT MODAL ======================== -->
 {#if editModalProductOpen}
-  <EditProductModal {categoryOptions} closeEditModal={closeEditProductModal} {handleEditProduct} bind:formData={productFormData} />
+  <EditProductModal {categoryOptions} closeEditModal={closeEditProductModal} {onProductEdited} {currentProduct} />
 {/if}
 
 <!-- ======================== DELETE PRODUCT MODAL ======================== -->
 {#if deleteModalOpen}
-  <DeleteProductModal {currentProduct} {handleDeleteProduct} {closeDeleteModal} />
+  <DeleteProductModal {currentProduct} {onProductDeleted} {closeDeleteProductModal} />
 {/if}
 
 <!-- ======================== GENERATE BARCODE MODAL ======================== -->
 {#if generateBarcodeModalOpen && currentProduct}
-  
+  <GenerateBarcode {currentProduct} {closeGenerateBarcodeModal} />
 {/if}
 
 <!-- ======================== VIEW PRODUCT DETAILS MODAL ======================== -->
-{#if viewBarcodeModalOpen && currentProduct?.barcode}
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
-    onclick={closeViewBarcodeModal}
-    onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeViewBarcodeModal(); }}
-    aria-hidden="true"
-  >
-    <div
-      class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="view-barcode-modal-title"
-      tabindex="-1"
-      onclick={(e) => e.stopPropagation()}
-      onkeydown={(e) => e.stopPropagation()}
-    >
-      <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
-        <h2 id="view-barcode-modal-title" class="text-lg font-semibold text-black">Product Details</h2>
-        <button
-          onclick={closeViewBarcodeModal}
-          class="p-2 text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-lg transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none"
-          aria-label="Close modal"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6L6 18M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-
-      <div class="p-6">
-        <!-- Product header -->
-        <div class="flex items-start gap-4 mb-6 pb-6 border-b border-neutral-100">
-          <div class="w-12 h-12 rounded-xl bg-neutral-100 flex items-center justify-center flex-shrink-0">
-            <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" class="text-neutral-600">
-              <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"/><line x1="7" x2="7.01" y1="7" y2="7"/>
-            </svg>
-          </div>
-          <div class="flex-1 min-w-0">
-            <h3 class="font-semibold text-black text-lg leading-tight">{currentProduct.productName}</h3>
-            <p class="text-sm text-neutral-500 font-mono mt-0.5">{currentProduct.productCode}</p>
-          </div>
-          <span class="inline-flex px-2.5 py-1 bg-neutral-100 text-neutral-700 rounded-full text-xs font-medium border border-neutral-200 flex-shrink-0">{currentProduct.category}</span>
-        </div>
-
-        <!-- Product details grid -->
-        <div class="grid grid-cols-2 gap-4 mb-6">
-          <div class="bg-neutral-50 rounded-xl p-4 border border-neutral-100">
-            <p class="text-xs text-neutral-500 mb-1 font-medium uppercase tracking-wider">Price</p>
-            <p class="text-xl font-bold text-black">₹{formatCurrency(currentProduct.price)}</p>
-          </div>
-          <div class="bg-neutral-50 rounded-xl p-4 border border-neutral-100">
-            <p class="text-xs text-neutral-500 mb-1 font-medium uppercase tracking-wider">Stock</p>
-            <p class="text-xl font-bold text-black">{currentProduct.quantity}</p>
-            <p class="text-xs text-neutral-400">units available</p>
-          </div>
-          <div class="bg-neutral-50 rounded-xl p-4 border border-neutral-100 col-span-2">
-            <p class="text-xs text-neutral-500 mb-1 font-medium uppercase tracking-wider">Inventory Value</p>
-            <p class="text-xl font-bold text-black">₹{formatCurrency(currentProduct.price * (currentProduct.quantity || 0))}</p>
-            <p class="text-xs text-neutral-400">{currentProduct.quantity} units × ₹{formatCurrency(currentProduct.price)}</p>
-          </div>
-        </div>
-
-        <!-- Barcode section -->
-        <div class="bg-neutral-50 border border-neutral-200 rounded-xl p-4 mb-6">
-          <div class="flex items-center justify-between mb-3">
-            <p class="text-xs text-neutral-500 font-medium uppercase tracking-wider">Barcode (EAN-13)</p>
-            <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-green-50 text-green-700 border border-green-200">
-              <svg xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="mr-1"><polyline points="20 6 9 17 4 12"/></svg>
-              Generated
-            </span>
-          </div>
-          <div class="flex items-end justify-center gap-0.5 h-10 mb-2">
-            {#each currentProduct.barcode.split('') as digit}
-              <div
-                class="bg-neutral-800 rounded-sm"
-                style="width: {(['0','3','6','9'].includes(digit)) ? '3px' : '2px'}; height: {parseInt(digit) % 3 === 0 ? '100%' : parseInt(digit) % 2 === 0 ? '72%' : '55%'}"
-              ></div>
-            {/each}
-          </div>
-          <p class="text-center font-mono text-sm font-semibold text-neutral-800 tracking-widest">{currentProduct.barcode}</p>
-        </div>
-
-        <div class="flex gap-3">
-          <button
-            onclick={() => {
-              if (currentProduct?.barcode) {
-                navigator.clipboard.writeText(currentProduct.barcode);
-                alert('Barcode copied to clipboard!');
-              }
-            }}
-            class="flex-1 px-4 py-2.5 border border-neutral-200 text-neutral-700 rounded-xl hover:bg-neutral-50 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"
-          >
-            Copy Barcode
-          </button>
-          <button
-            onclick={() => { if (currentProduct) { closeViewBarcodeModal(); openPrintBarcodeModal(currentProduct); } }}
-            class="flex-1 px-4 py-2.5 bg-black text-white rounded-xl hover:bg-neutral-800 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"
-          >
-            Print Label
-          </button>
-        </div>
-      </div>
-    </div>
-  </div>
+{#if viewProductDetailsModalOpen && currentProduct?.barcode}
+  <ViewProductModal {currentProduct} {closeViewProductModal} />
 {/if}
 
 <!-- ======================== PRINT BARCODE MODAL ======================== -->
 {#if printBarcodeModalOpen && currentProduct?.barcode}
-  <div
-    class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
-    onclick={closePrintBarcodeModal}
-    onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closePrintBarcodeModal(); }}
-    aria-hidden="true"
-  >
-    <div
-      class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in"
-      role="dialog"
-      aria-modal="true"
-      aria-labelledby="print-barcode-modal-title"
-      tabindex="-1"
-      onclick={(e) => e.stopPropagation()}
-      onkeydown={(e) => e.stopPropagation()}
-    >
-      <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
-        <h2 id="print-barcode-modal-title" class="text-lg font-semibold text-black">Print Barcode Labels</h2>
-        <button
-          onclick={closePrintBarcodeModal}
-          class="p-2 text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-lg transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none"
-          aria-label="Close modal"
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <path d="M18 6L6 18M6 6l12 12"/>
-          </svg>
-        </button>
-      </div>
-
-      <form onsubmit={(e) => { e.preventDefault(); handlePrintBarcode(); }} class="p-6 space-y-6">
-
-        <!-- Label preview -->
-        <div>
-          <p class="text-xs text-neutral-500 font-medium uppercase tracking-wider mb-3">Label Preview</p>
-          <div class="flex justify-center">
-            <!-- Simulated physical label: ~50mm × 25mm aspect ratio -->
-            <div class="relative bg-white border-2 border-neutral-300 rounded-md shadow-md px-4 pt-3 pb-2 w-64" style="font-family: monospace;">
-              <!-- Label top: product name + price -->
-              <div class="flex items-start justify-between mb-2 gap-2">
-                <p class="text-xs font-bold text-black leading-tight truncate flex-1">{currentProduct.productName}</p>
-                <p class="text-xs font-bold text-black flex-shrink-0">₹{formatCurrency(currentProduct.price)}</p>
-              </div>
-              <!-- Category badge -->
-              <p class="text-[10px] text-neutral-500 mb-2 uppercase tracking-wider">{currentProduct.category} · {currentProduct.productCode}</p>
-              <!-- Barcode bars -->
-              <div class="flex items-end justify-center gap-px h-8 mb-1 bg-white">
-                <!-- Left guard bars -->
-                <div class="bg-black rounded-sm" style="width:2px;height:100%"></div>
-                <div class="bg-white" style="width:1px;height:100%"></div>
-                <div class="bg-black rounded-sm" style="width:2px;height:100%"></div>
-                <!-- Data bars derived from barcode string -->
-                {#each currentProduct.barcode.split('') as digit, i}
-                  <div class="bg-white" style="width:1px;height:100%"></div>
-                  <div
-                    class="rounded-sm"
-                    style="background:{i % 5 === 0 ? '#000' : i % 3 === 0 ? '#111' : '#000'}; width:{(['0','2','4','6','8'].includes(digit)) ? '3px' : '2px'}; height:{parseInt(digit) % 3 === 0 ? '100%' : parseInt(digit) % 2 === 0 ? '80%' : '65%'}"
-                  ></div>
-                {/each}
-                <!-- Right guard bars -->
-                <div class="bg-white" style="width:1px;height:100%"></div>
-                <div class="bg-black rounded-sm" style="width:2px;height:100%"></div>
-                <div class="bg-white" style="width:1px;height:100%"></div>
-                <div class="bg-black rounded-sm" style="width:2px;height:100%"></div>
-              </div>
-              <!-- Barcode number -->
-              <p class="text-center text-[9px] text-neutral-700 tracking-widest font-mono">{currentProduct.barcode}</p>
-              <!-- Label corner cut marks -->
-              <div class="absolute top-1 left-1 w-2 h-2 border-t border-l border-neutral-400 rounded-tl-sm"></div>
-              <div class="absolute top-1 right-1 w-2 h-2 border-t border-r border-neutral-400 rounded-tr-sm"></div>
-              <div class="absolute bottom-1 left-1 w-2 h-2 border-b border-l border-neutral-400 rounded-bl-sm"></div>
-              <div class="absolute bottom-1 right-1 w-2 h-2 border-b border-r border-neutral-400 rounded-br-sm"></div>
-            </div>
-          </div>
-          <p class="text-center text-xs text-neutral-400 mt-2">50mm × 25mm · EAN-13</p>
-        </div>
-
-        <!-- Quantity selector -->
-        <div>
-          <label for="print-quantity" class="block text-sm font-medium text-neutral-700 mb-2">Number of Labels</label>
-          <div class="flex items-center gap-3">
-            <button
-              type="button"
-              onclick={() => printQuantity = Math.max(1, printQuantity - 1)}
-              class="w-10 h-10 rounded-lg border border-neutral-200 flex items-center justify-center hover:bg-neutral-50 transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none"
-              aria-label="Decrease quantity"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M5 12h14"/>
-              </svg>
-            </button>
-            <input
-              id="print-quantity"
-              type="number"
-              bind:value={printQuantity}
-              min="1"
-              max="100"
-              class="w-16 px-3 py-2 text-center border border-neutral-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white font-medium"
-            />
-            <button
-              type="button"
-              onclick={() => printQuantity = Math.min(100, printQuantity + 1)}
-              class="w-10 h-10 rounded-lg border border-neutral-200 flex items-center justify-center hover:bg-neutral-50 transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none"
-              aria-label="Increase quantity"
-            >
-              <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M5 12h14M12 5v14"/>
-              </svg>
-            </button>
-          </div>
-          <p class="text-xs text-neutral-400 mt-1">Maximum 100 labels per print job</p>
-        </div>
-
-        <!-- Print settings -->
-        <div class="bg-neutral-50 border border-neutral-200 rounded-xl p-4">
-          <h4 class="font-medium text-neutral-800 mb-2">Print Settings</h4>
-          <ul class="space-y-1.5 text-sm text-neutral-600">
-            <li class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-neutral-400"><polyline points="20 6 9 17 4 12"/></svg>
-              Label size: 50mm × 25mm
-            </li>
-            <li class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-neutral-400"><polyline points="20 6 9 17 4 12"/></svg>
-              Format: EAN-13 with human-readable text
-            </li>
-            <li class="flex items-center gap-2">
-              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="text-neutral-400"><polyline points="20 6 9 17 4 12"/></svg>
-              Printer: Default system printer
-            </li>
-          </ul>
-        </div>
-
-        <div class="flex gap-3 pt-2">
-          <button
-            type="button"
-            onclick={closePrintBarcodeModal}
-            class="flex-1 px-4 py-2.5 border border-neutral-200 text-neutral-700 rounded-xl hover:bg-neutral-50 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"
-          >
-            Cancel
-          </button>
-          <button
-            type="submit"
-            class="flex-1 px-4 py-2.5 bg-black text-white rounded-xl hover:bg-neutral-800 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"
-          >
-            Print {printQuantity} Label{printQuantity > 1 ? 's' : ''}
-          </button>
-        </div>
-      </form>
-    </div>
-  </div>
+ 
 {/if}
 </Layout>
 

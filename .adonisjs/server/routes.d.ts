@@ -14,6 +14,7 @@ export type ScannedRoutes = {
     'products.add_product': { paramsTuple?: []; params?: {} }
     'products.update_product': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
     'products.delete_product': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
+    'products.generate_product_barcode': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
   }
   GET: {
     'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
@@ -27,6 +28,7 @@ export type ScannedRoutes = {
     'authentication.sign_in': { paramsTuple?: []; params?: {} }
     'category.add_category': { paramsTuple?: []; params?: {} }
     'products.add_product': { paramsTuple?: []; params?: {} }
+    'products.generate_product_barcode': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
   }
   PATCH: {
     'category.update_category': { paramsTuple: [ParamValue]; params: {'categoryId': ParamValue} }

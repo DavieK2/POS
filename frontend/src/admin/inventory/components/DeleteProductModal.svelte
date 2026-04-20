@@ -1,12 +1,35 @@
 <script lang="ts">
+  import { showToast } from "../../../lib/toast";
+  import { BASE_URL } from "../../../utils";
   import type { Product } from "../main/types";
 
 
-  let { currentProduct, handleDeleteProduct, closeDeleteModal } : {
+  let { currentProduct, onProductDeleted, closeDeleteProductModal: closeDeleteModal } : {
     currentProduct: Product | null,
-    handleDeleteProduct: () => void,
-    closeDeleteModal: () => void
+    closeDeleteProductModal: () => void,
+    onProductDeleted: ( e : { message: string }) => void,
   } = $props();
+
+  const onDeleteProduct = async (): Promise<void> => {
+
+    if (!currentProduct) return;
+
+    const req = await fetch(`${BASE_URL}/product/delete/${currentProduct.id}`, {
+        method: 'DELETE',
+    });
+
+    
+    if( ! req.ok ) {
+      const res = await req.json()
+      console.log(res);
+      showToast(res.message)
+      return
+    }
+    const res = await req.json();
+    
+    onProductDeleted({ message: res.message })
+  }
+
 
 </script>
 <div
@@ -50,7 +73,7 @@
             Cancel
           </button>
           <button
-            onclick={handleDeleteProduct}
+            onclick={onDeleteProduct}
             class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium focus:ring-2 focus:ring-red-400 focus:outline-none"
           >
             Delete Product

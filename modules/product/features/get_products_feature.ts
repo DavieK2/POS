@@ -29,7 +29,8 @@ export default class GetProductsFeature extends BaseFeature<TError, any> {
             () => dbq.selectFrom("products")
                      .leftJoin("categories", "products.categoryId", "categories.id")
                      .selectAll('products')
-                     .select(() => sql<string>`${process.env.APP_URL} || products.product_image`.as('productImage') )
+                     .select( () => sql<string>`${process.env.APP_URL} || products.product_image`.as('productImage') )
+                     .select( () => sql<string>`${process.env.APP_URL} || products.barcode_image`.as('barcodeImage') )
                      .select("categories.categoryName as category")
                      .execute(),
             (err) => AppErrors.DBError(err, "There was an error fetching products")

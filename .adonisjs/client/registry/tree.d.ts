@@ -21,5 +21,6 @@ export interface ApiDefinition {
     addProduct: typeof routes['products.add_product']
     updateProduct: typeof routes['products.update_product']
     deleteProduct: typeof routes['products.delete_product']
+    generateProductBarcode: typeof routes['products.generate_product_barcode']
   }
 }

@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { BASE_URL } from "../../../utils";
   import type { Product } from "../main/types";
 
     interface BarcodeScanResult {
@@ -46,25 +47,26 @@
     closeGenerateBarcodeModal();
   }
 
-  async function handleGenerateBarcodeManually(): Promise<void> {
-    // if (!currentProduct) return;
-    // const product = currentProduct;
+  const handleGenerateBarcodeManually = async () : Promise<void> => {
+    
+    if (!currentProduct) return;
 
-    // try {
-    //   await new Promise(resolve => setTimeout(resolve, 1000));
-    //   const generatedBarcode = `890${Math.floor(Math.random() * 1000000000).toString().padStart(9, '0')}`;
-    //   const index = products.findIndex(p => p.id === product.id);
-      
-    //   if (index !== -1) {
-    //     products[index] = { ...products[index], barcode: generatedBarcode };
-    //   }
+    const req = await fetch(`${BASE_URL}/product/generate-barcode/${currentProduct.id}`, {
+        method: "POST",
+        headers: { 'Content-Type': 'application/json' }
+    });
 
-    //   alert(`Barcode generated: ${generatedBarcode}`);
-    //   closeGenerateBarcodeModal();
-    // } catch (error) {
-    //   console.error('Failed to generate barcode:', error);
-    //   alert('Failed to generate barcode. Please try again.');
-    // }
+    if( ! req.ok ){
+
+      console.log( req.json() );
+      return;
+
+    }
+    const res = await req.json();
+
+    console.log( res );
+
+    closeGenerateBarcodeModal();
   }
 
 

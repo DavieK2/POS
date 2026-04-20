@@ -1,17 +1,25 @@
 <script lang="ts">
+  import { showToast } from "../../../lib/toast";
   import Dropdown from "../../../shared/dropdown.svelte";
+  import { BASE_URL } from "../../../utils";
   import type { DropDownOptions, ProductFormData } from "../main/types";
 
-  let { closeAddModal, formData = $bindable(), handleAddProduct, categoryOptions } : {
+  let { closeAddModal, onProductAdded, categoryOptions } : {
     closeAddModal: () => void,
-    formData: ProductFormData,
-    handleAddProduct: (e: Event) => void,
+    onProductAdded: (params : { message: string }) => void,
     categoryOptions: DropDownOptions[];
   } = $props();
 
   let imagePreview = $state<string | null>(null);
   let isDragging = $state(false);
   let fileInput: HTMLInputElement;
+
+  const formData : ProductFormData = $state({
+      name: '',
+      category: '',
+      price: 0,
+      quantity: 0
+  })
 
   function handleImageFile(file: File) {
     if ( !file.type.startsWith("image/") ) return;
@@ -40,6 +48,33 @@
     imagePreview = null;
     formData.image = "";
     fileInput.value = "";
+  }
+
+   const handleAddProduct =  async (e: Event): Promise<void> =>  {
+      e.preventDefault();
+
+      const req = await fetch(`${BASE_URL}/product`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+              productName: formData.name,
+              category: formData.category,
+              price: formData.price,
+              quantity: formData.quantity,
+              description: formData.description,
+              image: formData.image
+          })
+      });
+
+      if( ! req.ok ) {
+        const res = await req.json()
+        console.log(res)
+        showToast(res.message)
+      }
+
+      const res = await req.json()
+
+      onProductAdded({ message: res.message });
   }
 </script>
 

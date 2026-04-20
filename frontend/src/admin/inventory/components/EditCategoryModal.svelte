@@ -1,14 +1,52 @@
-<script lang="ts">    
+<script lang="ts">
+  import { BASE_URL } from "../../../utils";
+  import type { Category } from "../main/types";
+
+    
     let { 
-        editCategoryName = $bindable(), 
-        handleEditCategory, 
-        closeEditCategoryModal
+        onCategoryEdited,
+        currentCategory,
+        closeEditCategoryModal,
+        categories
     } : {
-        editCategoryName: string;
-        handleEditCategory: (e: Event) => void;
+        onCategoryEdited : (e: { message: string }) => void;
+        currentCategory: Category;
         closeEditCategoryModal: () => void;
+        categories: Category[]
     } = $props();
 
+    let categoryName = $derived(currentCategory.categoryName);
+    const handleEditCategory = async (e: Event): Promise<void> => {
+
+      e.preventDefault();
+      
+
+      if (!currentCategory || ! categoryName.trim()) return;
+      
+      const newName = categoryName.trim();
+      
+      if ( categories.flatMap((c) => c.categoryName).includes(newName) ) {
+        closeEditCategoryModal();
+        return;
+      }
+    
+      const req = await fetch(`${BASE_URL}/category/update/${currentCategory.id}`, {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ categoryName: newName })
+      });
+
+      if( ! req.ok ) {
+        const res = await req.json()
+        console.log(res)
+        return;
+      }
+
+      const res = await req.json()
+
+      onCategoryEdited({ message: res.message })
+
+  }
 </script>
 <div
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
@@ -44,7 +82,7 @@
           <input
             id="edit-category-name"
             type="text"
-            bind:value={editCategoryName}
+            bind:value={categoryName}
             required
             placeholder="e.g., Accessories"
             class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white"

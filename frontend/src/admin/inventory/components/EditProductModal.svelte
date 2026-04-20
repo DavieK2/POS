@@ -1,19 +1,19 @@
 <script lang="ts">
-  import { on } from "svelte/events";
   import Dropdown from "../../../shared/dropdown.svelte";
-  import type { DropDownOptions, ProductFormData } from "../main/types";
+  import { BASE_URL } from "../../../utils";
+  import type { DropDownOptions, Product, ProductFormData } from "../main/types";
   import { onMount } from "svelte";
 
   let {
     closeEditModal,
-    formData = $bindable(),
-    handleEditProduct,
+    onProductEdited,
     categoryOptions,
+    currentProduct
   }: {
     closeEditModal: () => void;
-    formData: ProductFormData;
-    handleEditProduct: (e: Event) => void;
+    onProductEdited: ( e: { message: string }) => void;
     categoryOptions: DropDownOptions[];
+    currentProduct: Product | null
   } = $props();
 
   let imagePreview = $state<string | null>(null);
@@ -21,8 +21,15 @@
   let fileInput: HTMLInputElement;
 
   onMount(() => {
-    if (formData.image) imagePreview = formData.image;
+    if (currentProduct?.productImage) imagePreview = currentProduct.productImage;
   });
+
+  const formData : ProductFormData = $derived({
+      name: currentProduct?.productName || '',
+      category: currentProduct?.categoryId || '',
+      price: currentProduct?.price || 0,
+      quantity: currentProduct?.quantity ||  0
+  })
 
   function handleImageFile(file: File) {
     if (!file.type.startsWith("image/")) return;
@@ -52,6 +59,38 @@
     formData.image = "";
     fileInput.value = "";
   }
+
+  const handleEditProduct = async (e: Event): Promise<void> => {
+
+    e.preventDefault();
+
+    if (  !currentProduct ) return;
+
+    const req = await fetch(`${BASE_URL}/product/update/${currentProduct.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            productName: formData.name,
+            category: formData.category,
+            price: formData.price,
+            quantity: formData.quantity,
+            description: formData.description,
+            image: formData.image
+        })
+    });
+
+    
+    if( ! req.ok ) {
+      const res = await req.json();
+      console.log(res);
+      return
+    } 
+    
+    const res = await req.json();
+
+    onProductEdited({ message: res.message })
+  }
+
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
@@ -129,7 +168,7 @@
       </div>
       <div>
         <label for="edit-name" class="block text-sm font-medium text-neutral-700 mb-1">Product Name *</label>
-        <input id="edit-name" type="text" bind:value={formData.name} required placeholder="e.g., Cotton T-Shirt" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
+        <input id="edit-name" type="text" value={formData.name} required placeholder="e.g., Cotton T-Shirt" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
       </div>
 
       <div>
@@ -140,11 +179,11 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label for="edit-price" class="block text-sm font-medium text-neutral-700 mb-1">Price (&#8358) *</label>
-          <input id="edit-price" type="number" bind:value={formData.price} required min="0" step="0.01" placeholder="0.00" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
+          <input id="edit-price" type="number" value={formData.price} required min="0" step="0.01" placeholder="0.00" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
         </div>
         <div>
           <label for="edit-stock" class="block text-sm font-medium text-neutral-700 mb-1">Stock *</label>
-          <input id="edit-stock" type="number" bind:value={formData.quantity} required min="0" placeholder="0" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
+          <input id="edit-stock" type="number" value={formData.quantity} required min="0" placeholder="0" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
         </div>
       </div>
 

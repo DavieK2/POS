@@ -1,16 +1,37 @@
 <script lang="ts">
+  import { showToast } from "../../../lib/toast";
+  import { BASE_URL } from "../../../utils";
   import type { Category } from "../main/types";
 
 
     let { 
         currentCategory,
-        handleDeleteCategory,
+        onCategoryDeleted,
         closeDeleteCategoryModal,
     } : {
         currentCategory: Category;
-        handleDeleteCategory: (e: Event) => void;
+        onCategoryDeleted: (e: { message: string }) => void;
         closeDeleteCategoryModal: () => void;
     } = $props();
+
+    const handleDeleteCategory = async (): Promise<void> => {
+    if (! currentCategory) return;
+
+    const req = await fetch(`${BASE_URL}/category/delete/${currentCategory.id}`, {
+        method: 'DELETE',
+    });
+
+    if( ! req.ok ) {
+      const res = await req.json()
+      console.log(res)
+      showToast(res.message)
+      return;
+    }
+    
+    const res = await req.json()
+
+    onCategoryDeleted({message: res.message})
+  }
 
 </script>
 

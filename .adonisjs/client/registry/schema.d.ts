@@ -127,4 +127,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['deleteProduct']>>>
     }
   }
+  'products.generate_product_barcode': {
+    methods: ["POST"]
+    pattern: '/product/generate-barcode/:product'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { product: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['generateProductBarcode']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['generateProductBarcode']>>>
+    }
+  }
 }
