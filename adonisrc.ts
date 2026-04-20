@@ -54,7 +54,8 @@ export default defineConfig({
     () => import('@adonisjs/cors/cors_provider'),
     () => import('@adonisjs/auth/auth_provider'),
     () => import('#providers/api_provider'),
-    () => import('@adonisjs-community/girouette/girouette_provider')
+    () => import('@adonisjs-community/girouette/girouette_provider'),
+    () => import('@adonisjs/drive/drive_provider')
   ],
 
   /*
@@ -115,9 +116,9 @@ export default defineConfig({
       }),
       generateRegistry(),
       indexControllers({
-          source: "./modules",
-          glob: ["**/controllers/*_controller.ts"],
-          importAlias: "#modules"
+        source: "./modules",
+        glob: ["**/controllers/*_controller.ts"],
+        importAlias: "#modules"
       })
     ],
   },

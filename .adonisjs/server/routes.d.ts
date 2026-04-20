@@ -4,6 +4,7 @@ type ParamValue = string | number | bigint | boolean
 
 export type ScannedRoutes = {
   ALL: {
+    'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'authentication.sign_in': { paramsTuple?: []; params?: {} }
     'category.get_categories': { paramsTuple?: []; params?: {} }
     'category.add_category': { paramsTuple?: []; params?: {} }
@@ -15,10 +16,12 @@ export type ScannedRoutes = {
     'products.delete_product': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
   }
   GET: {
+    'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'category.get_categories': { paramsTuple?: []; params?: {} }
     'products.get_products': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
+    'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
   }
   POST: {
     'authentication.sign_in': { paramsTuple?: []; params?: {} }

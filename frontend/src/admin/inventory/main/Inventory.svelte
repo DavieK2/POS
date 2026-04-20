@@ -165,7 +165,8 @@
               category: productFormData.category,
               price: productFormData.price,
               quantity: productFormData.quantity,
-              description: productFormData.description
+              description: productFormData.description,
+              image: productFormData.image
           })
       });
 
@@ -193,7 +194,8 @@
             category: productFormData.category,
             price: productFormData.price,
             quantity: productFormData.quantity,
-            description: productFormData.description
+            description: productFormData.description,
+            image: productFormData.image
         })
     });
 

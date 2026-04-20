@@ -10,6 +10,7 @@ import ResponseMessage from "#services/response_message";
 import { v7 } from "uuid";
 import { ControlledTransaction } from "kysely";
 import { DB } from "#database/db_shema";
+import ImageUpload, { ValidatedImage } from "#services/image_upload";
 
 const rules = type({
     productName: 'string & string > 0',
@@ -29,9 +30,20 @@ export default class AddProductFeature extends BaseFeature<TError, any> {
                                         // .withAuth()
                                         .chain( (_, data) => ValidationService.validate({ data, rules }) )
                                         .chainAsyncAndStore('dbTransaction', (_,__) => startDBTrasaction() )
-                                        .chain((dbTransaction, data) => this.addNewProduct({
+                                        .chainWhenAndStore({
+                                            storeKey: 'validatedImage',
+                                            condition: (_, data) => !!data.image,
+                                            action : ( _, data ) => this.validateImage( data.image! ),
+                                        })
+                                        .chainWhenAndStore({
+                                            storeKey: 'imageUrl',
+                                            condition: (_, data) => !!data.image,
+                                            action : ( _, data ) => this.uploadImage( data.__validatedImage! )
+                                        })
+                                        .chain((_, data) => this.addNewProduct({
                                             ...data,
-                                            dbTransaction: dbTransaction
+                                            image: data.__imageUrl,
+                                            dbTransaction: data.__dbTransaction
                                         }))
                                         .chainAsync( (_, data) => commitDBTrasaction( data.__dbTransaction ) )
                                         .chain( (_,__) => ResponseMessage.successMessage("Product added successfully") )
@@ -42,8 +54,21 @@ export default class AddProductFeature extends BaseFeature<TError, any> {
                                         .run();
     }
 
+    validateImage( image: string ) {
+        return E.tryCatch(
+            () => ImageUpload.validateBase64Image(image),
+            () => AppErrors.ValidationErrorMessage("The provided image is not valid")
+        )
+    }
 
-    addNewProduct = ( opts: { productName: string, category: string, price: number, quantity?: number, description?: string, dbTransaction: ControlledTransaction<DB, []>  }) => {
+    uploadImage( image: ValidatedImage ) {
+        return TE.tryCatch(
+            () => ImageUpload.save( image, 'products' ),
+            (err) => AppErrors.UnhandledError(err, "There was an error uploading the product image")
+        )
+    }
+
+    addNewProduct = ( opts: ParamsType & { dbTransaction: ControlledTransaction<DB, []>  }) => {
     
         const productCode : string = btoa( Math.random().toString() ).substring(15, 25).toUpperCase();
 
@@ -55,7 +80,8 @@ export default class AddProductFeature extends BaseFeature<TError, any> {
                 price: opts.price,
                 quantity: opts.quantity,
                 description: opts.description,
-                categoryId: opts.category
+                categoryId: opts.category,
+                productImage: opts.image
             }).execute(),
             (err) => AppErrors.DBError(err, "There was an error adding this product")
         );
