@@ -10,6 +10,7 @@ import { createCanvas } from 'canvas';
 import JSBarcode from 'jsbarcode';
 import { pipe } from "fp-ts/lib/function.js";
 import { dbq } from "#config/db";
+import ResponseMessage from "#services/response_message";
 
 const rules = type({
     product: 'string & string > 0'
@@ -26,6 +27,13 @@ export default class GenerateBarcodeFeature extends BaseFeature<TError, any> {
                                             .chain( (_, data) => validateProduct( data.product ) )
                                             .chainAndStore('barcode', (_, __) => this.generateBarcode() )
                                             .chainAndStore("barcodeImage", (barcode, __ ) => this.generateBarcodeImage(barcode) )
+                                            .chainAndStore("uploadPath", (image, _) => this.uploadBarcodeImage( image ) )
+                                            .chain( (_, data) => this.updateBarcodeImagePathToProduct({
+                                                productId: data.product,
+                                                barcode: data.__barcode,
+                                                barcodePath: data.__uploadPath
+                                            }))
+                                            .chain((_,__) => ResponseMessage.successMessage("Barcode successfully generated") )
                                             .catchErrors()
                                             .handle<TError>({
                                                 'Default': (err: TError) => TE.left(err),
@@ -84,7 +92,7 @@ export default class GenerateBarcodeFeature extends BaseFeature<TError, any> {
         )
     }
 
-    updatedBarcodeImagePathToProduct( opts: { productId: string, barcode: string, barcodePath: string } ){
+    updateBarcodeImagePathToProduct( opts: { productId: string, barcode: string, barcodePath: string } ){
 
         return TE.tryCatch(
             () => dbq.updateTable("products")
