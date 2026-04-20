@@ -9,6 +9,7 @@ import { uploadImage, validateImage, validateProduct } from "../tasks/product_ta
 import { createCanvas } from 'canvas';
 import JSBarcode from 'jsbarcode';
 import { pipe } from "fp-ts/lib/function.js";
+import { dbq } from "#config/db";
 
 const rules = type({
     product: 'string & string > 0'
@@ -83,7 +84,19 @@ export default class GenerateBarcodeFeature extends BaseFeature<TError, any> {
         )
     }
 
-    
+    updatedBarcodeImagePathToProduct( opts: { productId: string, barcode: string, barcodePath: string } ){
+
+        return TE.tryCatch(
+            () => dbq.updateTable("products")
+                     .set({
+                        barcode: opts.barcode,
+                        barcodeImage: opts.barcodePath
+                     })
+                     .where("id", '=', opts.productId)
+                     .executeTakeFirstOrThrow(),
+            (err) => AppErrors.DBError(err, "There was an error saving the barcode")
+        )
+    }
 
 
 }
