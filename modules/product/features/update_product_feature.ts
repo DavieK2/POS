@@ -36,7 +36,7 @@ export default class UpdateProductFeature extends BaseFeature<TError, any> {
                                         .chainWhenAndStore({
                                             storeKey: 'imageUrl',
                                             condition: (_, data) => !!data.image,
-                                            action : ( _, data ) => uploadImage( data.__validatedImage! )
+                                            action : ( _, data ) => uploadImage( data.__validatedImage!, 'products' )
                                         })
                                         .chain( (_, data) => this.updateProduct( { ...data, image: data.__imageUrl } ) )
                                         .chain( (_,__) => ResponseMessage.successMessage("Product successfully updated"))

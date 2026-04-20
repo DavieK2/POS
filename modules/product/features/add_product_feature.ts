@@ -38,7 +38,7 @@ export default class AddProductFeature extends BaseFeature<TError, any> {
                                         .chainWhenAndStore({
                                             storeKey: 'imageUrl',
                                             condition: (_, data) => !!data.image,
-                                            action : ( _, data ) => uploadImage( data.__validatedImage! )
+                                            action : ( _, data ) => uploadImage( data.__validatedImage!, 'products' )
                                         })
                                         .chain((_, data) => this.addNewProduct({
                                             ...data,

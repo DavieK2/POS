@@ -27,14 +27,14 @@ export const validateProduct = ( productId: string ) => {
 
 export const validateImage = ( image: string ) => {
     return E.tryCatch(
-        () => ImageUpload   .validateBase64Image(image),
+        () => ImageUpload.validateBase64Image(image),
         () => AppErrors.ValidationErrorMessage("The provided image is not valid")
     )
 }
 
-export const uploadImage = ( image: ValidatedImage ) => {
+export const uploadImage = ( image: ValidatedImage, path: string ) => {
     return TE.tryCatch(
-        () => ImageUpload.save( image, 'products' ),
+        () => ImageUpload.save( image, path ),
         (err) => AppErrors.UnhandledError(err, "There was an error uploading the product image")
     )
 }
