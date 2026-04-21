@@ -1,6 +1,6 @@
 <script lang="ts">
+  import type { Category } from "../../../shared/types";
   import { BASE_URL } from "../../../utils";
-  import type { Category } from "../main/types";
 
     
     let { 
@@ -35,14 +35,13 @@
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ categoryName: newName })
       });
+      
+      const res = await req.json()
 
       if( ! req.ok ) {
-        const res = await req.json()
         console.log(res)
         return;
       }
-
-      const res = await req.json()
 
       onCategoryEdited({ message: res.message })
 

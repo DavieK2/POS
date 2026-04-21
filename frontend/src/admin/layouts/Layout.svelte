@@ -1,6 +1,6 @@
 <!-- Dashboard.svelte -->
 <script lang="ts">
-  import { onMount, setContext } from 'svelte';
+  import { onMount } from 'svelte';
   import Icon from '../../lib/Icon.svelte';
   import { goto } from '@mateothegreat/svelte5-router';
   import { toastMessage } from '../../lib/toast';
@@ -61,7 +61,7 @@
   </div>
 {/if}
 
-<div class="flex min-h-screen bg-neutral-50 text-neutral-900 font-sans antialiased">
+<div class="main-font flex min-h-screen bg-neutral-50 text-neutral-900 font-sans antialiased">
   <aside 
     class="
       fixed inset-y-0 left-0 z-50 w-64 bg-neutral-900 text-white 

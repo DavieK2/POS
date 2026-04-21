@@ -163,4 +163,28 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['generateProductBarcode']>>>
     }
   }
+  'products.search_products_by_barcode': {
+    methods: ["GET"]
+    pattern: '/products/search/barcode'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['searchProductsByBarcode']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['searchProductsByBarcode']>>>
+    }
+  }
+  'products.search_products_by_product_name': {
+    methods: ["GET"]
+    pattern: '/products/search'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['searchProductsByProductName']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/product/controllers/products_controller').default['searchProductsByProductName']>>>
+    }
+  }
 }

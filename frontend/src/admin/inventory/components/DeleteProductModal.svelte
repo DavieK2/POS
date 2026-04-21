@@ -1,7 +1,7 @@
 <script lang="ts">
   import { showToast } from "../../../lib/toast";
+  import type { Product } from "../../../shared/types";
   import { BASE_URL } from "../../../utils";
-  import type { Product } from "../main/types";
 
 
   let { currentProduct, onProductDeleted, closeDeleteProductModal: closeDeleteModal } : {
@@ -18,14 +18,13 @@
         method: 'DELETE',
     });
 
+    const res = await req.json()
     
     if( ! req.ok ) {
-      const res = await req.json()
       console.log(res);
       showToast(res.message)
       return
     }
-    const res = await req.json();
     
     onProductDeleted({ message: res.message })
   }

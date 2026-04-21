@@ -1,8 +1,8 @@
-<script>
+<script lang="ts">
   import Authenticator from "../../lib/Authenticator.svelte";
-  import Settings from "../components/Settings.svelte";
+  import Home from "./Home.svelte";
 
 </script>
 <Authenticator>
-    <Settings />
+  <Home />
 </Authenticator>

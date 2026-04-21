@@ -1,7 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Layout from "../../layouts/Layout.svelte";
-  import type { Category, DropDownOptions, Product, ProductFormData } from "./types";
   import CatogeryModal from "../components/CatogeryModal.svelte";
   import EditCategoryModal from "../components/EditCategoryModal.svelte";
   import { BASE_URL, formatCurrency } from "../../../utils";
@@ -15,6 +14,7 @@
   import ViewProductModal from "../components/ViewProductModal.svelte";
   import { showToast } from "../../../lib/toast";
   import PrintBarcodeModal from "../components/PrintBarcodeModal.svelte";
+  import type { Category, DropDownOptions, Product } from "../../../shared/types";
   
   
 
@@ -294,14 +294,14 @@
             <td class="px-4 md:px-6 py-4">
               <div class="flex items-center justify-center gap-1">
                 {#if product.barcode}
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono bg-green-50 text-green-700 border border-green-200">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-green-50 text-green-700 border border-green-200">
                     <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="mr-1">
                       <polyline points="20 6 9 17 4 12"/>
                     </svg>
                     Generated
                   </span>
                 {:else}
-                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-mono bg-neutral-100 text-neutral-600 border border-neutral-200">
+                  <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-neutral-100 text-neutral-600 border border-neutral-200">
                     Pending
                   </span>
                 {/if}

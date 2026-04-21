@@ -1,7 +1,8 @@
 <script lang="ts">
   import Dropdown from "../../../shared/dropdown.svelte";
+  import type { DropDownOptions, Product } from "../../../shared/types";
   import { BASE_URL } from "../../../utils";
-  import type { DropDownOptions, Product, ProductFormData } from "../main/types";
+  import type { ProductFormData } from "../main/types";
   import { onMount } from "svelte";
 
   let {
@@ -80,14 +81,12 @@
     });
 
     
+    const res = await req.json();
     if( ! req.ok ) {
-      const res = await req.json();
       console.log(res);
       return
     } 
-    
-    const res = await req.json();
-
+  
     onProductEdited({ message: res.message })
   }
 
@@ -168,7 +167,7 @@
       </div>
       <div>
         <label for="edit-name" class="block text-sm font-medium text-neutral-700 mb-1">Product Name *</label>
-        <input id="edit-name" type="text" value={formData.name} required placeholder="e.g., Cotton T-Shirt" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
+        <input id="edit-name" type="text" bind:value={formData.name} required placeholder="e.g., Cotton T-Shirt" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
       </div>
 
       <div>
@@ -179,11 +178,11 @@
       <div class="grid grid-cols-2 gap-4">
         <div>
           <label for="edit-price" class="block text-sm font-medium text-neutral-700 mb-1">Price (&#8358) *</label>
-          <input id="edit-price" type="number" value={formData.price} required min="0" step="0.01" placeholder="0.00" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
+          <input id="edit-price" type="number" bind:value={formData.price} required min="0" step="0.01" placeholder="0.00" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
         </div>
         <div>
           <label for="edit-stock" class="block text-sm font-medium text-neutral-700 mb-1">Stock *</label>
-          <input id="edit-stock" type="number" value={formData.quantity} required min="0" placeholder="0" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
+          <input id="edit-stock" type="number" bind:value={formData.quantity} required min="0" placeholder="0" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
         </div>
       </div>
 

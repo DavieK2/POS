@@ -1,5 +1,6 @@
 <script lang="ts">
-  import type { Category } from "../main/types";
+  import type { Category } from "../../../shared/types";
+
 
   let { 
     categories, 

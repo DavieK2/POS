@@ -17,12 +17,16 @@ export type ScannedRoutes = {
     'products.update_product': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
     'products.delete_product': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
     'products.generate_product_barcode': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
+    'products.search_products_by_barcode': { paramsTuple?: []; params?: {} }
+    'products.search_products_by_product_name': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'printer.get_printers': { paramsTuple?: []; params?: {} }
     'category.get_categories': { paramsTuple?: []; params?: {} }
     'products.get_products': { paramsTuple?: []; params?: {} }
+    'products.search_products_by_barcode': { paramsTuple?: []; params?: {} }
+    'products.search_products_by_product_name': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }

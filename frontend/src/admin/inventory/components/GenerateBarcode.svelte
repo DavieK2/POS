@@ -1,7 +1,8 @@
 <script lang="ts">
   import { showToast } from "../../../lib/toast";
+  import Button from "../../../shared/button.svelte";
+  import type { Product } from "../../../shared/types";
   import { BASE_URL } from "../../../utils";
-  import type { Product } from "../main/types";
 
     interface BarcodeScanResult {
         scannedCode: string;
@@ -18,6 +19,7 @@
 
     let barcodeGenerationMode = $state<'scan' | 'manual'>('manual');
     let scannedBarcodeData = $state<BarcodeScanResult | null>(null);
+    let isLoading = $state(false)
 
 
       // Handle barcode scan simulation (replace with actual scanner integration)
@@ -53,22 +55,28 @@
     
     if (!currentProduct) return;
 
+    isLoading = true;
+
     const req = await fetch(`${BASE_URL}/product/generate-barcode/${currentProduct.id}`, {
         method: "POST",
         headers: { 'Content-Type': 'application/json' }
     });
+    
+    const res = await req.json();
 
     if( ! req.ok ){
 
-      const res = await req.json();
       console.log( res );
       showToast(res.message)
+
+      isLoading = false
       return;
 
     }
-    const res = await req.json();
 
     onBarcodeGenerated({ message: res.message })
+
+    isLoading = false
   }
 
 
@@ -227,12 +235,11 @@
               Apply Barcode
             </button>
           {:else}
-            <button
+            <Button
+              label="Generate Barcode"
+              loading={isLoading}
               onclick={handleGenerateBarcodeManually}
-              class="flex-1 px-4 py-2.5 bg-black text-white rounded-xl hover:bg-neutral-800 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"
-            >
-              Generate Barcode
-            </button>
+            />
           {/if}
         </div>
       </div>

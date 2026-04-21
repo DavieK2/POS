@@ -19,7 +19,11 @@ import path from "node:path";
 
 const rules = type({
     product: 'string & string > 0',
-    printer: 'string & string > 0'
+    printer: 'string & string > 0',
+    width: 'number',
+    height: 'number',
+    paperSize: 'string & string > 0',
+    quantity: 'number'
 });
 
 type ParamsType = typeof rules.infer
@@ -44,8 +48,13 @@ export default class PrintBarcodeFeature extends BaseFeature<TError, any> {
                                         // 👇 Wire in the print step
                                         .chain((_, data) => this.printBarcode({
                                             barcode: data.__product.barcode!,
-                                            printer: data.__validPrinter.deviceId
+                                            printer: data.__validPrinter.deviceId,
+                                            barcodeHeight: data.height,
+                                            barcodeWidth: data.width,
+                                            pageSize: data.paperSize,
+                                            quantity: data.quantity
                                         }))
+                                        .chain( (message, _) => ResponseMessage.successMessage(message))
                                         .catchErrors()
                                         .handle<TError>({
                                             'Default': (err: TError) => TE.left(err),
@@ -65,14 +74,13 @@ export default class PrintBarcodeFeature extends BaseFeature<TError, any> {
      * Generates a barcode PDF and sends it to the specified printer.
      * Wrapped in TaskEither so it fits the fp-ts pipeline.
      */
-    printBarcode(p: { barcode: string; printer: string }): TE.TaskEither<TError, string> {
+    printBarcode(p: { barcode: string; printer: string, pageSize: string, barcodeHeight: number, barcodeWidth: number, quantity: number }): TE.TaskEither<TError, string> {
         return TE.tryCatch(
             async () => {
-                // 1. Build a temp file path so we don't collide on concurrent prints
                 const filePath = path.join(os.tmpdir(), `barcode-${Date.now()}.pdf`);
 
                 // 2. Create canvas with PDF backend (288x144 pts = 4x2 inch label)
-                const canvas = createCanvas(288, 144, 'pdf');
+                const canvas = createCanvas((72*p.barcodeWidth), (72*p.barcodeHeight), 'pdf');
 
                 // 3. Draw the barcode onto the canvas
                 JsBarcode(canvas, p.barcode, {
@@ -97,8 +105,9 @@ export default class PrintBarcodeFeature extends BaseFeature<TError, any> {
                 await pdfToPrinter.print(filePath, {
                     printer: p.printer,  
                     scale: 'noscale',
-                    paperSize: '2x4in',
-                    monochrome: true
+                    paperSize: p.pageSize,
+                    monochrome: true,
+                    copies: p.quantity
                 });
 
                 // 6. Clean up the temp file (fire-and-forget, don't fail the job)
@@ -107,7 +116,7 @@ export default class PrintBarcodeFeature extends BaseFeature<TError, any> {
                 return `Barcode ${p.barcode} printed successfully`;
             },
             // Map any thrown error into your TError shape
-            (err) => AppErrors.HandledError(err, "There was an error printing") as TError
+            (err) => AppErrors.HandledError(err, "There was an error printing")
         );
     }
 }

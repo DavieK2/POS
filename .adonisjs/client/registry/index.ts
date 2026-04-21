@@ -84,6 +84,18 @@ const routes = {
     tokens: [{"old":"/product/generate-barcode/:product","type":0,"val":"product","end":""},{"old":"/product/generate-barcode/:product","type":0,"val":"generate-barcode","end":""},{"old":"/product/generate-barcode/:product","type":1,"val":"product","end":""}],
     types: placeholder as Registry['products.generate_product_barcode']['types'],
   },
+  'products.search_products_by_barcode': {
+    methods: ["GET"],
+    pattern: '/products/search/barcode',
+    tokens: [{"old":"/products/search/barcode","type":0,"val":"products","end":""},{"old":"/products/search/barcode","type":0,"val":"search","end":""},{"old":"/products/search/barcode","type":0,"val":"barcode","end":""}],
+    types: placeholder as Registry['products.search_products_by_barcode']['types'],
+  },
+  'products.search_products_by_product_name': {
+    methods: ["GET"],
+    pattern: '/products/search',
+    tokens: [{"old":"/products/search","type":0,"val":"products","end":""},{"old":"/products/search","type":0,"val":"search","end":""}],
+    types: placeholder as Registry['products.search_products_by_product_name']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

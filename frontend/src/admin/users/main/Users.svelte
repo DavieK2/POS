@@ -1,5 +1,7 @@
 <script lang="ts">
-  import Layout from "../layouts/Layout.svelte";
+  import Layout from "../../layouts/Layout.svelte";
+
+  
 
   type UserRole = "Admin" | "Manager" | "Staff" | "Viewer";
   type UserStatus = "Active" | "Inactive";

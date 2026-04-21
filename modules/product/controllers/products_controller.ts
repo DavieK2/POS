@@ -6,6 +6,8 @@ import { Delete, Get, Patch, Post } from "@adonisjs-community/girouette";
 import UpdateProductFeature from "../features/update_product_feature.ts";
 import DeleteProductFeature from "../features/delete_product_feature.ts";
 import GenerateBarcodeFeature from "../features/generate_barcode_feature.ts";
+import SearchProductsBarcodeFeature from "#modules/product/features/search_products_by_barcode_feature";
+import SearchProductsFeature from "#modules/product/features/search_products_feature";
 
 export default class ProductsController extends BaseController {
     
@@ -32,5 +34,15 @@ export default class ProductsController extends BaseController {
     @Post('/product/generate-barcode/:product')
     async generateProductBarcode( { request } : HttpContext){
         return this.process( new GenerateBarcodeFeature, { ...request.params() } )
+    }
+
+    @Get('/products/search/barcode')
+    async searchProductsByBarcode({ request } : HttpContext ) {
+        return this.process( new SearchProductsBarcodeFeature, { ...request.all() } )
+    }
+
+    @Get('/products/search')
+    async searchProductsByProductName({ request } : HttpContext ) {
+        return this.process( new SearchProductsFeature, { ...request.all() } )
     }
 }

@@ -5,6 +5,7 @@ import BaseFeature from "../../../app/contracts/base_feature.js";
 import { Auth } from "#services/pipeline_builder";
 import { type } from "arktype";
 import { dbq } from "#config/db";
+import { sql } from "kysely";
 
 const rules = type({});
 
@@ -25,7 +26,12 @@ export default class GetCategoryFeature extends BaseFeature<TError, any> {
 
     getCategories = () => {
         return TE.tryCatch(
-            () => dbq.selectFrom("categories").selectAll().execute(),
+            () => dbq.selectFrom("categories")
+                    .leftJoin("products", "products.categoryId", "categories.id")
+                    .select(['categories.id', 'categories.categoryName'])
+                    .select(() => sql<string>`count(products.id)`.as('productCount'))
+                    .groupBy(['categories.id', 'categories.categoryName'])
+                    .execute(),
             (err) => AppErrors.DBError(err, "There was an error fetching categories")
         )
     }

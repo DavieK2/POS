@@ -1,6 +1,6 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import type { DropDownOptions } from "../admin/inventory/main/types";
+  import type { DropDownOptions } from "./types";
 
   let {
     selected = $bindable({ text: 'Select Item', value: '' }),
@@ -47,7 +47,7 @@
   <button
     type="button"
     onclick={toggleDropdown}
-    class="w-full px-4 py-3 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white flex items-center justify-between gap-2 text-left"
+    class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white flex items-center justify-between gap-2 text-left"
     aria-haspopup="listbox"
     aria-expanded={openDropdown}
   >

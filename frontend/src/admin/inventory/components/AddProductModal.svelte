@@ -1,8 +1,10 @@
 <script lang="ts">
   import { showToast } from "../../../lib/toast";
+  import Button from "../../../shared/button.svelte";
   import Dropdown from "../../../shared/dropdown.svelte";
+  import type { DropDownOptions } from "../../../shared/types";
   import { BASE_URL } from "../../../utils";
-  import type { DropDownOptions, ProductFormData } from "../main/types";
+  import type {  ProductFormData } from "../main/types";
 
   let { closeAddModal, onProductAdded, categoryOptions } : {
     closeAddModal: () => void,
@@ -13,6 +15,7 @@
   let imagePreview = $state<string | null>(null);
   let isDragging = $state(false);
   let fileInput: HTMLInputElement;
+  let isLoading = $state(false)
 
   const formData : ProductFormData = $state({
       name: '',
@@ -51,6 +54,9 @@
   }
 
    const handleAddProduct =  async (e: Event): Promise<void> =>  {
+
+      isLoading = true;
+
       e.preventDefault();
 
       const req = await fetch(`${BASE_URL}/product`, {
@@ -66,15 +72,16 @@
           })
       });
 
+      const res = await req.json()
+
       if( ! req.ok ) {
-        const res = await req.json()
         console.log(res)
         showToast(res.message)
       }
 
-      const res = await req.json()
-
       onProductAdded({ message: res.message });
+
+      isLoading = false;
   }
 </script>
 
@@ -218,12 +225,8 @@
         >
           Cancel
         </button>
-        <button
-          type="submit"
-          class="flex-1 px-4 py-2.5 bg-black text-white rounded-xl hover:bg-neutral-800 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"
-        >
-          Add Product
-        </button>
+        <Button label="Add Product" loading={isLoading} />
+
       </div>
     </form>
   </div>

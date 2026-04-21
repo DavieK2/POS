@@ -1,6 +1,6 @@
 <script lang="ts">
+  import type { Product } from "../../../shared/types";
   import { formatCurrency } from "../../../utils";
-  import type { Product } from "../main/types";
 
     let { closeViewProductModal: closeViewProductModal, currentProduct } : {
         currentProduct: Product
