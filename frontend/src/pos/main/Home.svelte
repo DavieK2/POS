@@ -300,7 +300,7 @@
 
 <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 <div
-  class="flex flex-col h-screen overflow-hidden main-font bg-zinc-300 text-[#0A0A0A] antialiased select-none"
+  class="flex flex-col h-screen overflow-hidden main-font bg-zinc-300/40 text-[#0A0A0A] antialiased select-none"
   onkeydown={(e) => {
     if (e.key === "Escape") {
     }

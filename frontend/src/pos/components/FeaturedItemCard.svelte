@@ -10,32 +10,30 @@
     onDecQty: (product: ActiveOrderItem) => void;
     onIncQty: (product: ActiveOrderItem) => void;
     updateQty: (product: ActiveOrderItem, q: number) => void;
-    onRemoveItem: (product: ActiveOrderItem ) => void;
+    onRemoveItem: (product: ActiveOrderItem) => void;
     onOpenNumpad: (product: ActiveOrderItem) => void;
   }
   let { currentSelectedItem, isHeld, onDecQty, onIncQty, updateQty, onRemoveItem, onOpenNumpad }: Props = $props();
 
   let isNumpadOpen = $state(false);
-  let inputValue: string = $derived(currentSelectedItem?.qty.toString() || "")
+  let inputValue: string = $derived(currentSelectedItem?.qty.toString() || "");
 
-  function numpadPress( val: string): void {
-    
-        let current = inputValue;
+  function numpadPress(val: string): void {
+    let current = inputValue;
 
-        if      (val === "backspace") current = current.slice(0, -1);
-        else if (val === "clear")     current = "1";
-        else                          current += val; 
-        
-        inputValue = current;
-        updateQty( currentSelectedItem!, (inputValue === "" ? 1 : parseInt(inputValue)) )
+    if (val === "backspace") current = current.slice(0, -1);
+    else if (val === "clear") current = "1";
+    else current += val;
+
+    inputValue = current;
+    updateQty(currentSelectedItem!, inputValue === "" ? 1 : parseInt(inputValue));
   }
 
   $effect(() => {
-      if( currentSelectedItem && ! isNumpadOpen){
-        inputValue = currentSelectedItem.qty.toString()
-      }
-  })
-
+    if (currentSelectedItem && !isNumpadOpen) {
+      inputValue = currentSelectedItem.qty.toString();
+    }
+  });
 </script>
 
 {#if currentSelectedItem}
@@ -44,15 +42,23 @@
            {isHeld ? 'opacity-60 pointer-events-none' : ''}"
   >
     <!-- Product image -->
-    <div class="w-30 h-30 bg-zinc-100 rounded-xl overflow-hidden shrink-0">
-      <img src={currentSelectedItem.productImage} alt={currentSelectedItem.productName} class="w-full h-full object-cover mix-blend-multiply" />
+    <div class="w-30 h-30 bg-zinc-100 rounded-xl overflow-hidden shrink-0 flex items-center justify-center">
+      {#if currentSelectedItem.productImage}
+        <img src={currentSelectedItem.productImage} alt={currentSelectedItem.productName} class="w-full h-full object-cover mix-blend-multiply" />
+      {:else}
+        <svg class="size-10" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="2" aria-hidden="true">
+          <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+          <circle cx="8.5" cy="8.5" r="1.5" />
+          <path d="M21 15l-5-5L5 21" />
+        </svg>
+      {/if}
     </div>
 
     <!-- Product info + qty controls -->
     <div class="flex-1 flex flex-col justify-between">
       <div>
         <p class="text-xl font-bold text-[#0A0A0A] leading-tight mt-2 my-0.5">{currentSelectedItem.productName}</p>
-        <p class="font-['DM_Mono',monospace] text-sm text-zinc-500">{ fmt(currentSelectedItem.price) }/piece</p>
+        <p class="text-sm text-zinc-500">{fmt(currentSelectedItem.price)} / piece</p>
       </div>
 
       <div class="flex justify-between items-end mt-2.5">
@@ -85,12 +91,14 @@
               onOpenNumpad(currentSelectedItem);
               isNumpadOpen = true;
             }}
-            oninput={(e) =>{
-                e.stopPropagation();
-                const val = e.currentTarget.value.replace(/[^0-9]/g, "");
-                updateQty( currentSelectedItem, (val === "" ? 1 : parseInt(val)) )            
+            oninput={(e) => {
+              e.stopPropagation();
+              const val = e.currentTarget.value.replace(/[^0-9]/g, "");
+              updateQty(currentSelectedItem, val === "" ? 1 : parseInt(val));
             }}
-            onblur={ () => { isNumpadOpen = false } }
+            onblur={() => {
+              isNumpadOpen = false;
+            }}
             class="w-10 text-center bg-transparent font-['DM_Mono',monospace] text-[18px]
                    font-medium text-[#0A0A0A] outline-none hide-spinners m-0 p-0 cursor-pointer"
             readonly={isHeld}
@@ -108,10 +116,7 @@
           >
 
           {#if isNumpadOpen}
-            <Numpad
-              onPress={(val) => numpadPress(val)}
-              onClose={() => isNumpadOpen = false}
-            />
+            <Numpad onPress={(val) => numpadPress(val)} onClose={() => (isNumpadOpen = false)} />
           {/if}
         </div>
 
@@ -132,11 +137,11 @@
         e.stopPropagation();
         onRemoveItem(currentSelectedItem);
       }}
-      class="absolute top-3 right-3 w-7 h-7 bg-zinc-100 border-none rounded-[7px]
-             flex items-center justify-center text-zinc-400 cursor-pointer
-             hover:bg-red-50 hover:text-red-600 transition-colors"
+      class="absolute top-3 right-3 w-8.5 h-8.5 bg-red-50 border-none rounded-[7px]
+             flex items-center justify-center text-red-500 cursor-pointer
+             hover:bg-red-100 hover:text-red-600 transition-colors"
     >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+      <svg class="size-4" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <path d="M3 6h18" />
         <path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" />
         <path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" />

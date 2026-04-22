@@ -2,17 +2,18 @@
   import type { ActiveOrderItem, Order } from "../main/types";
   import { fmt } from "../main/utils";
 
-  
-  let { activeOrder, onSelectProduct }: {
+  let {
+    activeOrder,
+    onSelectProduct,
+  }: {
     activeOrder: Order | null;
     onSelectProduct: (product: ActiveOrderItem) => void;
   } = $props();
 </script>
 
 <div class="flex-1 bg-white border border-zinc-200 rounded-xl overflow-hidden min-h-0 relative">
-
   <!-- Empty state illustration -->
-  {#if !activeOrder || activeOrder.items.length === 0 }
+  {#if !activeOrder || activeOrder.items.length === 0}
     <div class="absolute inset-0 flex flex-col items-center justify-center gap-4 p-8 z-20 bg-white">
       <div class="relative">
         <div class="absolute -top-1 -right-1 w-16 h-20 bg-zinc-100 border border-zinc-200 rounded-lg rotate-6"></div>
@@ -33,9 +34,7 @@
       </div>
       <div class="text-center">
         <p class="text-base font-bold text-[#0A0A0A] mb-1">Order is empty</p>
-        <p class="text-xs text-zinc-400 font-medium leading-relaxed max-w-50">
-          Browse the catalog or scan a product to get started.
-        </p>
+        <p class="text-xs text-zinc-400 font-medium leading-relaxed max-w-50">Browse the catalog or scan a product to get started.</p>
       </div>
     </div>
   {/if}
@@ -57,7 +56,10 @@
           {@const isSelected = item.id === activeOrder?.currentSelectedItem?.id}
           <tr
             class="border-b border-zinc-100 cursor-pointer transition-colors {isSelected ? 'bg-zinc-100' : 'hover:bg-neutral-50'}"
-            onclick={(e) => { e.stopPropagation(); onSelectProduct(item); }}
+            onclick={(e) => {
+              e.stopPropagation();
+              onSelectProduct(item);
+            }}
             onkeydown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
@@ -68,8 +70,16 @@
             aria-selected={isSelected}
           >
             <td class="py-2 pl-4 pr-2">
-              <div class="w-8 h-8 rounded-md overflow-hidden bg-zinc-100">
-                <img src={item.productImage} alt="" class="w-full h-full object-cover" />
+              <div class="w-8 h-8 rounded-md overflow-hidden bg-zinc-300 flex items-center justify-center">
+                {#if item.productImage}
+                  <img src={item.productImage} alt="" class="w-full h-full object-cover" />
+                {:else}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#A1A1AA" stroke-width="2" aria-hidden="true">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+                    <circle cx="8.5" cy="8.5" r="1.5" />
+                    <path d="M21 15l-5-5L5 21" />
+                  </svg>
+                {/if}
               </div>
             </td>
             <td class="py-2 px-2 min-w-30">
@@ -98,5 +108,7 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
-  .table-scrollbar-container::-webkit-scrollbar { display: none; }
+  .table-scrollbar-container::-webkit-scrollbar {
+    display: none;
+  }
 </style>

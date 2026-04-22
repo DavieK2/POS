@@ -1,5 +1,5 @@
 export interface POSProduct {
-    id: number;
+    id: string;
     productCode: string;
     productName: string;
     category?: string;
