@@ -9,7 +9,7 @@ export interface POSProduct {
     productImage?: string;
 }
 
-export type OrderStatus = "active" | "held";
+export type OrderStatus = "active" | "held" | "cancelled" | "paid";
 export type PaymentMethod = "cash" | "card" | "transfer";
 export type PastOrderStatus = "paid" | "cancelled";
  
@@ -33,7 +33,9 @@ export interface Order {
   status: OrderStatus;
   discount: number;
   note: string;
-  items: OrderItem[];
+  paymentMethod? : string;
+  items: ActiveOrderItem[];
+  currentSelectedItem: ActiveOrderItem | null
 }
  
 export interface PastOrder {

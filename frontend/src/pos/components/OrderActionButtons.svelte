@@ -27,13 +27,13 @@
   const hasDiscount = $derived((activeOrder?.discount ?? 0) > 0);
 </script>
 
-<div class="grid grid-cols-4 gap-2 flex-shrink-0">
+<div class="grid grid-cols-4 gap-2 shrink-0">
 
   <!-- Add / Edit Note -->
   <button
     onclick={(e) => { e.stopPropagation(); onOpenNote(); }}
-    class="cursor-pointer bg-white border rounded-[11px] p-[9px_8px] flex items-center justify-center gap-[6px]
-           text-[14px] font-medium transition-colors
+    class="cursor-pointer bg-white border rounded-[11px] p-[9px_8px] flex items-center justify-center gap-1.5
+           text-sm font-medium transition-colors
            {isEmpty || isHeld
              ? 'opacity-40 pointer-events-none border-zinc-200 text-zinc-700'
              : hasNote
@@ -50,8 +50,8 @@
   <!-- Hold / Resume -->
   <button
     onclick={(e) => { e.stopPropagation(); onHoldOrder(); }}
-    class="cursor-pointer bg-white border rounded-[11px] p-[9px_8px] flex items-center justify-center gap-[6px]
-           text-[14px] font-medium transition-colors
+    class="cursor-pointer bg-white border rounded-[11px] p-[9px_8px] flex items-center justify-center gap-1.5
+           text-sm font-medium transition-colors
            {isEmpty
              ? 'opacity-40 pointer-events-none border-zinc-200 text-zinc-700'
              : isHeld
@@ -67,8 +67,8 @@
   <!-- Discount -->
   <button
     onclick={(e) => { e.stopPropagation(); onOpenDiscount(); }}
-    class="cursor-pointer bg-white border rounded-[11px] p-[9px_8px] flex items-center justify-center gap-[6px]
-           text-[14px] font-semibold transition-colors
+    class="cursor-pointer bg-white border rounded-[11px] p-[9px_8px] flex items-center justify-center gap-1.5
+           text-sm font-medium transition-colors
            {isEmpty || isHeld
              ? 'opacity-40 pointer-events-none border-zinc-200 text-zinc-700'
              : hasDiscount
@@ -85,9 +85,9 @@
   <!-- Cancel Order -->
   <button
     onclick={(e) => { e.stopPropagation(); onOpenCancel(); }}
-    class="cursor-pointer bg-white border border-zinc-200 rounded-[11px] p-[9px_8px] flex items-center justify-center gap-[6px]
-           text-[14px] font-medium text-zinc-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors
-           {isEmpty || isHeld ? 'opacity-40 pointer-events-none' : ''}"
+    class="cursor-pointer bg-white border border-zinc-200 rounded-[11px] p-[9px_8px] flex items-center justify-center gap-1.5
+           text-sm font-medium text-zinc-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors
+           {! activeOrder || isHeld ? 'opacity-40 pointer-events-none' : ''}"
   >
     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M9 9L15 15M15 9L9 15M7.8 21H16.2C17.88 21 18.72 21 19.36 20.67A3 3 0 0 0 20.67 19.36C21 18.72 21 17.88 21 16.2V7.8C21 6.12 21 5.28 20.67 4.64A3 3 0 0 0 19.36 3.33C18.72 3 17.88 3 16.2 3H7.8C6.12 3 5.28 3 4.64 3.33A3 3 0 0 0 3.33 4.64C3 5.28 3 6.12 3 7.8V16.2C3 17.88 3 18.72 3.33 19.36A3 3 0 0 0 4.64 20.67C5.28 21 6.12 21 7.8 21Z" />

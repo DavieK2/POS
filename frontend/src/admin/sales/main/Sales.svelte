@@ -101,7 +101,7 @@
       <div class="mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
           <div>
-            <h1 class="text-2xl md:text-3xl font-bold text-black mb-1">Sales History</h1>
+            <h1 class="text-xl md:text-xl font-bold text-black mb-1">Sales History</h1>
             <p class="text-neutral-500 text-sm">View and manage all sales transactions</p>
           </div>
           <button 

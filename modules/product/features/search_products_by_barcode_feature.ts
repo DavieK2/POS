@@ -7,6 +7,7 @@ import { type } from "arktype";
 import ValidationService from "#services/validation_services";
 import { dbq } from "#config/db";
 import { sql } from "kysely";
+import ResponseMessage from "#services/response_message";
 
 const rules = type({
     query: "string & string > 0"
@@ -21,6 +22,10 @@ export default class SearchProductsByBarcodeFeature extends BaseFeature<TError, 
                                                 // .withAuth()
                                                 .chain((_, data) => ValidationService.validate({ rules, data }))
                                                 .chain( (_, data) => this.searchProductProductBarcode(data.query))
+                                                .chain( (data, __) => TE.right({
+                                                    message: 'Product successfully retrieved',
+                                                    product: data
+                                                }))
                                                 .catchErrors()
                                                 .handle<TError>({
                                                     'Default': (err: TError) => TE.left(err),
@@ -32,12 +37,12 @@ export default class SearchProductsByBarcodeFeature extends BaseFeature<TError, 
 
         return TE.tryCatch(
             () => dbq.selectFrom("products")
-                     .where('barcode', 'like', `%${barcode}%`)
+                     .where('barcode', '=', `${barcode}`)
                      .leftJoin("categories", "products.categoryId", "categories.id")
                      .select(['products.id', 'products.barcode', 'products.productName', 'products.productCode', 'products.price', 'products.categoryId'])
                      .select( () => sql<string>`${process.env.APP_URL} || products.product_image`.as('productImage') )
                      .select("categories.categoryName as category")
-                     .execute(),
+                     .executeTakeFirstOrThrow(),
             (err) => AppErrors.DBError(err, "There was an error retrieving items")
         )
 

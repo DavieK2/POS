@@ -4,9 +4,7 @@
 
 
   interface Props {
-    activeOrderId: string | null;
     activeOrder: Order | null;
-    activeItems: EnrichedItem[];
     total: number;
     payMethod: PaymentMethod;
     onPayMethodChange: (m: PaymentMethod) => void;
@@ -14,9 +12,7 @@
     onConfirm: () => void;
   }
   let {
-    activeOrderId,
     activeOrder,
-    activeItems,
     total,
     payMethod,
     onPayMethodChange,
@@ -35,7 +31,7 @@
 >
   <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
   <div
-    class="bg-white rounded-[20px] w-full max-w-[340px] shadow-2xl overflow-hidden animate-slide-up max-h-[90vh]"
+    class="bg-white rounded-[20px] w-full max-w-85 shadow-2xl overflow-hidden animate-slide-up max-h-[90vh]"
     role="document"
     onclick={(e) => e.stopPropagation()}
     onkeydown={(e) => e.stopPropagation()}
@@ -43,7 +39,7 @@
     <!-- Header -->
     <div class="bg-[#0A0A0A] p-5">
       <p class="text-[12px] font-bold tracking-[0.12em] uppercase text-white/40 mb-1">
-        Pay Order #{activeOrderId}
+        Pay Order #{activeOrder?.id}
       </p>
       <p id="pay-modal-title" class="font-['DM_Mono',monospace] text-[42px] font-medium text-white leading-none tracking-[-0.02em]">
         {fmt(total)}
@@ -57,7 +53,7 @@
 
     <!-- Body -->
     <div class="p-5">
-      <p class="text-[12px] font-bold tracking-[0.1em] uppercase text-zinc-400 mb-3">Payment Method</p>
+      <p class="text-xs font-bold tracking-widest uppercase text-zinc-400 mb-3">Payment Method</p>
 
       <!-- Method picker -->
       <div class="grid grid-cols-3 gap-2 mb-5">
@@ -65,16 +61,10 @@
           <button
             onclick={() => onPayMethodChange(m.id)}
             aria-pressed={payMethod === m.id}
-            class="flex flex-col items-center gap-2 p-1.5 rounded-[12px] border-2 transition-all
+            class="flex flex-col items-center gap-2 p-2 rounded-lg border-2 transition-all
                    {payMethod === m.id ? 'border-[#0A0A0A] bg-zinc-50' : 'border-zinc-200 hover:border-zinc-300'}"
           >
-            <svg
-              width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-              class="size-5 {payMethod === m.id ? 'text-[#0A0A0A]' : 'text-zinc-400'}"
-            >
-              {@html m.icon}
-            </svg>
-            <span class="text-[10px] font-bold tracking-[0.06em] uppercase {payMethod === m.id ? 'text-[#0A0A0A]' : 'text-zinc-400'}">
+            <span class="text-xs font-semibold tracking-[0.06em] uppercase {payMethod === m.id ? 'text-[#0A0A0A]' : 'text-zinc-400'}">
               {m.label}
             </span>
           </button>
@@ -82,14 +72,14 @@
       </div>
 
       <!-- Items summary -->
-      <div class="bg-zinc-50 rounded-[12px] p-3 mb-3 divide-y divide-zinc-200 max-h-36 overflow-y-auto custom-scrollbar">
-        {#each activeItems as item}
+      <div class="bg-zinc-50 rounded-xl p-3 mb-3 divide-y divide-zinc-200 max-h-36 overflow-y-auto custom-scrollbar">
+        {#each activeOrder!.items as item}
           <div class="flex justify-between items-center py-1.5 first:pt-0 last:pb-0">
-            <span class="text-[13px] font-medium text-zinc-600 truncate max-w-[160px]">
-              {item.product.name} ×{item.qty}
+            <span class="text-sm font-medium text-zinc-600 truncate max-w-40">
+              {item.productName} ×{item.qty}
             </span>
-            <span class="font-['DM_Mono',monospace] text-[13px] font-medium text-zinc-800">
-              {fmt(item.product.price * item.qty)}
+            <span class="font-['DM_Mono',monospace] text-sm font-medium text-zinc-800">
+              {fmt(item.price * item.qty)}
             </span>
           </div>
         {/each}
@@ -99,13 +89,13 @@
       <div class="flex gap-2">
         <button
           onclick={onClose}
-          class="flex-1 py-3 rounded-[12px] border border-zinc-200 text-[15px] font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
+          class="flex-1 py-3 rounded-xl border border-zinc-200 text-base font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
         >
           Cancel
         </button>
         <button
           onclick={onConfirm}
-          class="flex-1 py-3 rounded-[12px] bg-[#0A0A0A] text-white text-[15px] font-semibold hover:opacity-80 active:scale-95 transition-all"
+          class="flex-1 py-3 rounded-xl bg-[#0A0A0A] text-white text-base font-semibold hover:opacity-80 active:scale-95 transition-all"
         >
           Confirm
         </button>

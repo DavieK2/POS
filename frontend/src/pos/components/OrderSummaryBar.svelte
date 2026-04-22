@@ -7,13 +7,13 @@
   interface Props {
     isEmpty: boolean;
     isHeld: boolean;
-    activeItems: EnrichedItem[];
+    totalItems: number
     subtotal: number;
     total: number;
     activeOrder: Order | null;
     onOpenPay: () => void;
   }
-  let { isEmpty, isHeld, activeItems, subtotal, total, activeOrder, onOpenPay }: Props = $props();
+  let { isEmpty, isHeld, totalItems, subtotal, total, activeOrder, onOpenPay }: Props = $props();
 
   const hasDiscount = $derived((activeOrder?.discount ?? 0) > 0);
 </script>
@@ -27,7 +27,7 @@
         <p class="text-[11px] font-bold tracking-[0.12em] uppercase text-yellow-300/40 mb-1">Items</p>
         <p class="font-['DM_Mono',monospace] text-[24px] font-medium leading-none
                   {isEmpty ? 'text-white/25' : 'text-yellow-300'}">
-          {isEmpty ? "0" : activeItems.length}
+          {isEmpty ? "0" : totalItems}
         </p>
       </div>
 
@@ -65,7 +65,7 @@
     <button
       onclick={(e) => { e.stopPropagation(); onOpenPay(); }}
       disabled={isEmpty || isHeld}
-      class="px-8 py-2.5 h-20 flex flex-col items-center justify-center rounded-2xl font-bold text-2xl transition-all
+      class="px-8 py-2.5 h-20 flex flex-col items-center justify-center rounded-2xl font-bold text-xl transition-all
              {isEmpty || isHeld
                ? 'bg-zinc-300 text-zinc-400 cursor-not-allowed'
                : 'bg-yellow-500/50 text-black hover:bg-yellow-500/40 active:scale-95 cursor-pointer'}"

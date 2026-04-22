@@ -2,8 +2,9 @@ import app from '@adonisjs/core/services/app'
 import { defineConfig } from '@adonisjs/lucid'
 
 const DBPaths = [
-  'modules/product/migrations'
-  // 'modules/user/migrations'
+  'modules/product/migrations',
+  'modules/orders/migrations',
+  'modules/user/migrations'
 ];
 
 const dbConfig = defineConfig({

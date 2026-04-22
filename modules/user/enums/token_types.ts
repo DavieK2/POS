@@ -1,7 +1,0 @@
-enum TokenType {
-    EMAIL_VERIFICATION = "EMAIL_VERIFICATION",
-    PASSWORD_RESET = "PASSWORD_RESET",
-    ACCESS_TOKEN = "ACCESS_TOKEN"
-}
-
-export default TokenType;

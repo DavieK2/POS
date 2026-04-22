@@ -9,8 +9,44 @@
 
 import router from '@adonisjs/core/services/router'
 import AuthenticationController from '#modules/auth/controllers/authentication_controller'
+import { generateReceiptStream } from '#modules/printer/tasks/printer_tasks';
 
-router.get('/', async () => {})
+router.get('/', async () => {
+
+    const demoPayload = {
+    printer: "Microsoft Print to PDF",
+    pageSize: "80mm",
+    // logoPath: path.join(__dirname, "assets/store-logo.png"), 
+    data: {
+        storeName: "Tech Haven Solutions",
+        address: "45 Alaba International, Ojo, Lagos",
+        date: new Date().toLocaleString(),
+        transactionId: "TXN-9982104",
+        paymentMode: "POS / Card",
+        printedBy: "Admin_Segun",
+        items: [
+            { name: "Logitech MX Master 3S", unitPrice: 85000, qty: 1 },
+            { name: "USB-C To HDMI Adapter", unitPrice: 12500, qty: 2 },
+            { name: "Laptop Stand Aluminum", unitPrice: 18000, qty: 1 },
+            { name: "Laptop Stand Aluminum", unitPrice: 18000, qty: 1 },
+            { name: "Laptop Stand Aluminum", unitPrice: 18000, qty: 1 },
+            { name: "Laptop Stand Aluminum", unitPrice: 18000, qty: 1 },
+            { name: "Laptop Stand Aluminum", unitPrice: 18000, qty: 1 },
+            { name: "Laptop Stand Aluminum", unitPrice: 18000, qty: 1 },
+            { name: "Laptop Stand Aluminum", unitPrice: 18000, qty: 1 },
+            { name: "Laptop Stand Aluminum", unitPrice: 18000, qty: 1 },
+            { name: "Laptop Stand Aluminum", unitPrice: 18000, qty: 1 },
+            { name: "Laptop Stand Aluminum", unitPrice: 18000, qty: 1 },
+            { name: "Laptop Stand Aluminum", unitPrice: 18000, qty: 1 },
+        ],
+        subtotal: 128000,
+        discount: 5000,
+        total: 123000
+    }
+};
+
+    await generateReceiptStream(demoPayload)
+})
 
 router.post('/auth/login', [AuthenticationController, 'signIn']);
 

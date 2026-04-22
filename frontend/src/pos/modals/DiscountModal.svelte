@@ -19,13 +19,13 @@
 >
   <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
   <div
-    class="bg-white rounded-[20px] w-full max-w-[300px] shadow-2xl p-5 animate-slide-up"
+    class="bg-white rounded-[20px] w-full max-w-75 shadow-2xl p-5 animate-slide-up"
     role="document"
     onclick={(e) => e.stopPropagation()}
     onkeydown={(e) => e.stopPropagation()}
   >
-    <h3 id="discount-modal-title" class="text-[18px] font-bold text-[#0A0A0A] mb-1">Apply Discount</h3>
-    <p class="text-[12px] text-zinc-400 mb-4">Maximum allowed: {fmt(subtotal)}</p>
+    <h3 id="discount-modal-title" class="text-lg font-bold text-[#0A0A0A] mb-1">Apply Discount</h3>
+    <p class="text-xs text-zinc-400 mb-4">Maximum allowed: {fmt(subtotal)}</p>
 
     <div class="relative mb-5">
       <span class="absolute left-3 top-1/2 -translate-y-1/2 text-zinc-400 font-bold" aria-hidden="true">₦</span>
@@ -34,21 +34,21 @@
         type="number"
         placeholder="0"
         aria-label="Discount amount in Naira"
-        class="w-full pl-7 pr-3 py-3 bg-zinc-50 border border-zinc-200 rounded-[12px] outline-none
-               focus:border-zinc-400 font-['DM_Mono',monospace] text-[18px] text-[#0A0A0A] hide-spinners"
+        class="w-full pl-7 pr-3 py-3 bg-zinc-50 border border-zinc-200 rounded-xl outline-none
+               focus:border-zinc-400 font-['DM_Mono',monospace] text-lg text-[#0A0A0A] hide-spinners"
       />
     </div>
 
     <div class="flex gap-2">
       <button
         onclick={onClose}
-        class="flex-1 py-2.5 rounded-[12px] border border-zinc-200 text-[14px] font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
+        class="flex-1 py-2.5 rounded-xl border border-zinc-200 text-sm font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
       >
         Cancel
       </button>
       <button
         onclick={onSave}
-        class="flex-1 py-2.5 rounded-[12px] bg-[#0A0A0A] text-white text-[14px] font-semibold hover:opacity-80 active:scale-95 transition-all"
+        class="flex-1 py-2.5 rounded-xl bg-[#0A0A0A] text-white text-sm font-semibold hover:opacity-80 active:scale-95 transition-all"
       >
         Apply
       </button>

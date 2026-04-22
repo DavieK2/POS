@@ -10,7 +10,8 @@ import { sql } from "kysely";
 
 const rules = type({
     query: type("string & string > 0").optional(),
-    category: type("string & string > 0").optional()
+    category: type("string & string > 0").optional(),
+    barcode: type("string & string > 0").optional(),
 });
 
 type ParamsType = typeof rules.infer
@@ -21,7 +22,7 @@ export default class SearchProductsFeature extends BaseFeature<TError, any> {
         return await SearchProductsFeature.use<typeof params, typeof params>(params)
                                                 // .withAuth()
                                                 .chain((_, data) => ValidationService.validate({ rules, data }))
-                                                .chain( (_, data) => this.searchProduct({query: data.query, category: data.category }))
+                                                .chain( (_, data) => this.searchProduct({query: data.query, category: data.category, barcode: data.barcode }))
                                                 .catchErrors()
                                                 .handle<TError>({
                                                     'Default': (err: TError) => TE.left(err),
@@ -29,7 +30,7 @@ export default class SearchProductsFeature extends BaseFeature<TError, any> {
                                                 .run();
     }
 
-    searchProduct( p: { query?: string, category?: string } ){
+    searchProduct( p: { query?: string, category?: string, barcode?: string } ){
 
         return TE.tryCatch(
             async () => {
@@ -40,6 +41,10 @@ export default class SearchProductsFeature extends BaseFeature<TError, any> {
                                 .select("categories.categoryName as category")
                 if( p.query ){
                     query = query.where('products.productName', 'like', `%${p.query}%`)
+                }
+
+                if( p.barcode ){
+                    query = query.where('products.barcode', 'like', `%${p.barcode}%`)
                 }
 
                 if( p.category ){

@@ -4,6 +4,13 @@ export interface Category {
     productCount?: number
 }
 
+export interface PrinterData {
+    deviceId: string;
+    name: string;
+    paperSizes: string[];
+  }
+
+
 export interface Product {
     id: string;
     productCode: string;

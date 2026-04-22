@@ -30,7 +30,7 @@
 
     <button
       onclick={() => onPress("clear")}
-      class="h-11 bg-zinc-50 border border-zinc-200 rounded-[10px] text-[14px] font-bold
+      class="h-11 bg-zinc-50 border border-zinc-200 rounded-[10px] text-sm font-bold
              text-zinc-600 hover:bg-zinc-100 active:scale-95 transition-all uppercase tracking-wider"
     >
       C

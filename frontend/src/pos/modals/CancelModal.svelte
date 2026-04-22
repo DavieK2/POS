@@ -1,10 +1,12 @@
 <script lang="ts">
+  import type { Order } from "../main/types";
+
   interface Props {
-    activeOrderId: string | null;
+    activeOrder: Order | null;
     onConfirm: () => void;
     onClose: () => void;
   }
-  let { activeOrderId, onConfirm, onClose }: Props = $props();
+  let { activeOrder, onConfirm, onClose }: Props = $props();
 </script>
 
 <div
@@ -26,21 +28,21 @@
       </svg>
     </div>
 
-    <h3 id="cancel-modal-title" class="text-[20px] font-bold text-[#0A0A0A] mb-2">Cancel Order?</h3>
-    <p class="text-[14px] text-zinc-500 mb-6">
-      Are you sure you want to cancel Order #{activeOrderId}? This action cannot be undone.
+    <h3 id="cancel-modal-title" class="text-lg font-bold text-[#0A0A0A] mb-2">Cancel Order?</h3>
+    <p class="text-sm text-zinc-500 mb-6">
+      Are you sure you want to cancel Order #{activeOrder?.id}? This action cannot be undone.
     </p>
 
     <div class="flex gap-2">
       <button
         onclick={onClose}
-        class="flex-1 py-2.5 rounded-[12px] border border-zinc-200 text-[14px] font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
+        class="flex-1 py-2.5 rounded-xl border border-zinc-200 text-sm font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
       >
         Keep Order
       </button>
       <button
         onclick={onConfirm}
-        class="flex-1 py-2.5 rounded-[12px] bg-red-600 text-white text-[14px] font-semibold hover:bg-red-700 active:scale-95 transition-all"
+        class="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 active:scale-95 transition-all"
       >
         Cancel Order
       </button>

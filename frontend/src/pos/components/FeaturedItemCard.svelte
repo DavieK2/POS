@@ -30,26 +30,32 @@
         updateQty( currentSelectedItem!, (inputValue === "" ? 1 : parseInt(inputValue)) )
   }
 
+  $effect(() => {
+      if( currentSelectedItem && ! isNumpadOpen){
+        inputValue = currentSelectedItem.qty.toString()
+      }
+  })
+
 </script>
 
 {#if currentSelectedItem}
   <div
-    class="bg-white border border-zinc-200 rounded-[16px] p-[14px] flex gap-[14px] flex-shrink-0 relative
+    class="bg-white border border-zinc-200 rounded-2xl p-4 flex gap-3.5 shrink-0 relative
            {isHeld ? 'opacity-60 pointer-events-none' : ''}"
   >
     <!-- Product image -->
-    <div class="w-[100px] h-[100px] bg-zinc-100 rounded-[12px] overflow-hidden flex-shrink-0">
+    <div class="w-30 h-30 bg-zinc-100 rounded-xl overflow-hidden shrink-0">
       <img src={currentSelectedItem.productImage} alt={currentSelectedItem.productName} class="w-full h-full object-cover mix-blend-multiply" />
     </div>
 
     <!-- Product info + qty controls -->
     <div class="flex-1 flex flex-col justify-between">
       <div>
-        <p class="text-2xl font-bold text-[#0A0A0A] leading-tight mb-[3px]">{currentSelectedItem.productName}</p>
-        <p class="font-['DM_Mono',monospace] text-[14px] text-zinc-500">{fmt(currentSelectedItem.price)}/piece</p>
+        <p class="text-xl font-bold text-[#0A0A0A] leading-tight mt-2 my-0.5">{currentSelectedItem.productName}</p>
+        <p class="font-['DM_Mono',monospace] text-sm text-zinc-500">{ fmt(currentSelectedItem.price) }/piece</p>
       </div>
 
-      <div class="flex justify-between items-end mt-[10px]">
+      <div class="flex justify-between items-end mt-2.5">
         <!-- Qty stepper + numpad anchor -->
         <div class="flex items-center gap-2.5 bg-zinc-100 rounded-[10px] p-1.25 relative">
           <button
@@ -58,7 +64,7 @@
               e.stopPropagation();
               onDecQty(currentSelectedItem);
             }}
-            class="w-7.5 h-[30px] bg-white border border-zinc-200 rounded-[7px] text-[20px]
+            class="w-7.5 h-7.5 bg-white border border-zinc-200 rounded-[7px] text-[20px]
                    flex items-center justify-center leading-none hover:bg-zinc-50
                    active:scale-90 active:bg-zinc-200 transition-all">−</button
           >
@@ -66,6 +72,7 @@
           <input
             type="text"
             id="qty-input"
+            autocomplete="off"
             bind:value={inputValue}
             aria-label="Item quantity"
             onfocus={(e) => {
@@ -83,7 +90,7 @@
                 const val = e.currentTarget.value.replace(/[^0-9]/g, "");
                 updateQty( currentSelectedItem, (val === "" ? 1 : parseInt(val)) )            
             }}
-            onblur={ () => isNumpadOpen = false }
+            onblur={ () => { isNumpadOpen = false } }
             class="w-10 text-center bg-transparent font-['DM_Mono',monospace] text-[18px]
                    font-medium text-[#0A0A0A] outline-none hide-spinners m-0 p-0 cursor-pointer"
             readonly={isHeld}
@@ -110,7 +117,7 @@
 
         <!-- Line subtotal -->
         <div class="text-right">
-          <p class="text-[11px] font-bold tracking-widest uppercase text-zinc-400 mb-[2px]">Subtotal</p>
+          <p class="text-[11px] font-bold tracking-widest uppercase text-zinc-400 mb-0.5">Subtotal</p>
           <p class="font-['DM_Mono',monospace] text-[26px] font-semibold text-[#0A0A0A] leading-none">
             {fmt(currentSelectedItem.price * currentSelectedItem.qty)}
           </p>
@@ -146,8 +153,8 @@
       </svg>
     </div>
     <div>
-      <p class="text-[16px] font-bold text-zinc-400">No item selected</p>
-      <p class="text-[13px] text-zinc-400 font-medium mt-[3px]">Add items from the catalog on the right or scan a barcode</p>
+      <p class="text-base font-bold text-zinc-400">No item selected</p>
+      <p class="text-xs text-zinc-400 font-medium mt-0.75">Add items from the catalog on the right or scan a barcode</p>
     </div>
   </div>
 {/if}

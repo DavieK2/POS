@@ -16,7 +16,7 @@
 >
   <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
   <div
-    class="bg-white rounded-[20px] w-full max-w-[340px] shadow-2xl p-5 animate-slide-up"
+    class="bg-white rounded-[20px] w-full max-w-85 shadow-2xl p-5 animate-slide-up"
     role="document"
     onclick={(e) => e.stopPropagation()}
     onkeydown={(e) => e.stopPropagation()}
@@ -27,20 +27,20 @@
       bind:value={draftNote}
       placeholder="Add special instructions or comments..."
       aria-label="Order note"
-      class="w-full h-32 p-3 bg-zinc-50 border border-zinc-200 rounded-[12px] resize-none outline-none
+      class="w-full h-32 p-3 bg-zinc-50 border border-zinc-200 rounded-xl resize-none outline-none
              focus:border-zinc-400 text-[14px] text-[#0A0A0A] mb-4 custom-scrollbar"
     ></textarea>
 
     <div class="flex gap-2">
       <button
         onclick={onClose}
-        class="flex-1 py-2.5 rounded-[12px] border border-zinc-200 text-[14px] font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
+        class="flex-1 py-2.5 rounded-xl border border-zinc-200 text-[14px] font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
       >
         Cancel
       </button>
       <button
         onclick={onSave}
-        class="flex-1 py-2.5 rounded-[12px] bg-[#0A0A0A] text-white text-[14px] font-semibold hover:opacity-80 active:scale-95 transition-all"
+        class="flex-1 py-2.5 rounded-xl bg-[#0A0A0A] text-white text-[14px] font-semibold hover:opacity-80 active:scale-95 transition-all"
       >
         Save Note
       </button>

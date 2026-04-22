@@ -1,18 +1,16 @@
 <script lang="ts">
-  import type { PaymentMethod } from "../main/types";
+  import type { Order, PaymentMethod } from "../main/types";
   import { fmt } from "../main/utils";
 
-  
-
   interface Props {
-    activeOrderId: string | null;
+    activeOrder: Order | null;
     total: number;
     payMethod: PaymentMethod;
     onConfirmAndPrint: () => void;
     onConfirm: () => void;
     onClose: () => void;
   }
-  let { activeOrderId, total, payMethod, onConfirmAndPrint, onConfirm, onClose }: Props = $props();
+  let { activeOrder, total, payMethod, onConfirmAndPrint, onConfirm, onClose }: Props = $props();
 </script>
 
 <div
@@ -23,7 +21,7 @@
 >
   <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
   <div
-    class="bg-white rounded-[24px] w-full max-w-[340px] shadow-2xl overflow-hidden animate-slide-up"
+    class="bg-white rounded-3xl w-full max-w-85 shadow-2xl overflow-hidden animate-slide-up"
     role="document"
     onclick={(e) => e.stopPropagation()}
     onkeydown={(e) => e.stopPropagation()}
@@ -37,7 +35,7 @@
       </div>
       <p id="pay-confirm-title" class="text-[20px] font-bold text-[#0A0A0A] mb-1">Confirm Payment?</p>
       <p class="text-[14px] text-zinc-500">
-        Order <span class="font-semibold text-zinc-700">#{activeOrderId}</span>
+        Order <span class="font-semibold text-zinc-700">#{activeOrder?.id}</span>
         &bull;
         <span class="font-['DM_Mono',monospace] font-semibold text-zinc-700">{fmt(total)}</span>
         via
@@ -48,7 +46,7 @@
     <div class="px-5 pb-5 flex flex-col gap-2">
       <button
         onclick={onConfirmAndPrint}
-        class="w-full py-3 rounded-[12px] bg-zinc-800 text-white text-[15px] font-medium hover:bg-zinc-700
+        class="w-full py-3 rounded-xl bg-zinc-800 text-white text-[15px] font-medium hover:bg-zinc-700
                active:scale-95 transition-all flex items-center justify-center gap-2"
       >
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -59,14 +57,14 @@
 
       <button
         onclick={onConfirm}
-        class="w-full py-3 rounded-[12px] bg-gray-500 text-white text-[15px] font-medium hover:opacity-80 active:scale-95 transition-all"
+        class="w-full py-3 rounded-xl bg-gray-500 text-white text-[15px] font-medium hover:opacity-80 active:scale-95 transition-all"
       >
         Confirm
       </button>
 
       <button
         onclick={onClose}
-        class="w-full py-3 rounded-[12px] border border-zinc-200 text-[15px] font-medium text-zinc-500 hover:bg-zinc-50 hover:text-zinc-700 transition-colors"
+        class="w-full py-3 rounded-xl border border-zinc-200 text-[15px] font-medium text-zinc-500 hover:bg-zinc-50 hover:text-zinc-700 transition-colors"
       >
         Close
       </button>

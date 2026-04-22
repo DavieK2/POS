@@ -1,5 +1,5 @@
 import AppErrors from "#exceptions/app_error";
-import UserType from "#modules/user/enums/user_types";
+import UserType from "#modules/user/types/user_types";
 import User from "#modules/user/models/user";
 import { pipe } from "fp-ts/lib/function.js";
 import * as TE from 'fp-ts/lib/TaskEither.js';

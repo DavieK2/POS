@@ -1,6 +1,6 @@
 <script lang="ts">
   import type { PastOrder, PastOrderStatus } from "../main/types";
-  import { fmt, getProduct } from "../main/utils";
+  import { fmt } from "../main/utils";
 
   
 
@@ -38,23 +38,23 @@
 >
   <!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
   <div
-    class="bg-white rounded-[24px] w-full max-w-[640px] h-[82vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up"
+    class="bg-white rounded-3xl w-full max-w-160 h-[82vh] flex flex-col shadow-2xl overflow-hidden animate-slide-up"
     role="document"
     onclick={(e) => e.stopPropagation()}
     onkeydown={(e) => e.stopPropagation()}
   >
     <!-- Dark header -->
-    <div class="bg-[#0A0A0A] px-6 pt-6 pb-5 flex-shrink-0">
+    <div class="bg-[#0A0A0A] px-6 pt-6 pb-5 shrink-0">
       <div class="flex justify-between items-start mb-5">
         <div>
-          <h3 id="history-modal-title" class="text-[22px] font-bold text-white leading-tight">Order History</h3>
-          <p class="text-[13px] text-white/40 font-medium mt-0.5">Session transactions</p>
+          <h3 id="history-modal-title" class="text-xl font-bold text-white leading-tight">Order History</h3>
+          <p class="text-sm text-white/40 font-medium mt-0.5">Session transactions</p>
         </div>
         <button
           onclick={onClose}
           aria-label="Close history"
           class="cursor-pointer w-8 h-8 rounded-full bg-white/10 flex items-center justify-center
-                 text-white/60 hover:bg-white/20 hover:text-white transition-all flex-shrink-0"
+                 text-white/60 hover:bg-white/20 hover:text-white transition-all shrink-0"
         >
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
             <line x1="18" y1="6" x2="6" y2="18" />
@@ -75,7 +75,7 @@
             type="text"
             placeholder="Search by order ID…"
             aria-label="Search order history"
-            class="bg-transparent text-[13px] text-white placeholder-white/30 font-medium outline-none w-full"
+            class="bg-transparent text-sm text-white placeholder-white/30 font-medium outline-none w-full"
           />
         </div>
 
@@ -84,7 +84,7 @@
             <button
               onclick={() => (historyFilter = f)}
               aria-pressed={historyFilter === f}
-              class="px-3 py-1.5 rounded-[7px] text-[12px] font-semibold capitalize transition-all
+              class="px-3 py-1.5 rounded-[7px] text-xs font-semibold capitalize transition-all
                      {historyFilter === f ? 'bg-white text-[#0A0A0A]' : 'text-white/50 hover:text-white/80'}"
             >
               {f}
@@ -105,8 +105,8 @@
             </svg>
           </div>
           <div>
-            <p class="text-[15px] font-medium text-zinc-500">No orders found</p>
-            <p class="text-[13px] text-zinc-400 mt-1">
+            <p class="text-base font-medium text-zinc-500">No orders found</p>
+            <p class="text-sm text-zinc-400 mt-1">
               {historySearch ? "Try a different search term" : "No past orders yet"}
             </p>
           </div>
@@ -122,15 +122,15 @@
                 aria-expanded={isExpanded}
                 aria-label="Order #{po.id} — {po.date} — {po.status} — {fmt(po.total)}"
               >
-                <span class="font-['DM_Mono',monospace] text-[14px] font-medium text-zinc-900">#{po.id}</span>
-                <span class="text-[13px] text-zinc-400 truncate">{po.date}</span>
-                <span class="text-[12px] font-medium text-zinc-500 flex items-center gap-1">
+                <span class="font-['DM_Mono',monospace] text-sm font-medium text-zinc-900">#{po.id}</span>
+                <span class="text-xs text-zinc-400 truncate">{po.date}</span>
+                <span class="text-xs font-medium text-zinc-500 flex items-center gap-1">
                   {po.status === "paid" ? "Paid" : "Cancelled"}
                   {#if po.method !== "-"}
                     <span class="text-xs font-normal font-mono capitalize text-zinc-400">({po.method})</span>
                   {/if}
                 </span>
-                <span class="font-['DM_Mono',monospace] text-[15px] font-medium text-right
+                <span class="font-['DM_Mono',monospace] text-base font-medium text-right
                              {po.status === 'cancelled' ? 'text-zinc-300 line-through' : 'text-[#0A0A0A]'}">
                   {fmt(po.total)}
                 </span>
@@ -147,11 +147,11 @@
               {#if isExpanded}
                 <div class="px-4 pb-4 pt-1">
                   {#if po.items.length === 0}
-                    <p class="text-[13px] text-zinc-400 italic">No items recorded.</p>
+                    <p class="text-sm text-zinc-400 italic">No items recorded.</p>
                   {:else}
-                    <div class="flex flex-col gap-2 mb-4 bg-zinc-50/50 p-3 rounded-[8px]">
+                    <div class="flex flex-col gap-2 mb-4 bg-zinc-50/50 p-3 rounded-lg">
                       {#each po.items as item}
-                        {@const product = getProduct(item.productId)}
+                        <!-- {@const product = getProduct(item.productId)}
                         {#if product}
                           <div class="flex justify-between items-center">
                             <span class="text-[13px] text-zinc-600">
@@ -162,7 +162,7 @@
                               {fmt(product.price * item.qty)}
                             </span>
                           </div>
-                        {/if}
+                        {/if} -->
                       {/each}
                     </div>
                   {/if}
@@ -170,7 +170,7 @@
                   <div class="flex justify-end">
                     <button
                       onclick={(e) => { e.stopPropagation(); onPrintReceipt(po.id); }}
-                      class="flex gap-1 cursor-pointer text-[12px] font-medium text-zinc-600
+                      class="flex gap-1 cursor-pointer text-xs font-medium text-zinc-600
                              hover:text-[#0A0A0A] border-b border-zinc-300 hover:border-[#0A0A0A] transition-all pb-0.5"
                     >
                       <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">

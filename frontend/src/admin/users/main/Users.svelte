@@ -170,10 +170,10 @@
   <div class="p-4 md:p-8 max-w-7xl mx-auto fade-in">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
       <div>
-        <h1 class="text-2xl md:text-3xl font-bold text-black mb-1">User Management</h1>
+        <h1 class="text-xl md:text-xl font-bold text-black mb-1">User Management</h1>
         <p class="text-neutral-500 text-sm">Manage team members and their access permissions</p>
       </div>
-      <button on:click={openAddModal} class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-black text-white rounded-xl hover:bg-neutral-800 transition-colors shadow-sm focus:ring-2 focus:ring-neutral-400 focus:outline-none">
+      <button onclick={openAddModal} class="inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-black text-white rounded-xl hover:bg-neutral-800 transition-colors shadow-sm focus:ring-2 focus:ring-neutral-400 focus:outline-none">
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" class="w-4 h-4">
           <path d="M5 12h14" /><path d="M12 5v14" />
         </svg>
@@ -261,7 +261,7 @@
 
     <div class="bg-white rounded-xl border border-neutral-200 overflow-hidden">
       <div class="overflow-x-auto">
-        <table class="w-full min-w-[700px]">
+        <table class="w-full min-w-175">
           <thead class="bg-neutral-50 border-b border-neutral-200">
             <tr>
               <th scope="col" class="text-left px-4 md:px-6 py-4 text-xs font-semibold text-neutral-600 uppercase tracking-wider">User</th>
@@ -299,12 +299,12 @@
                 <td class="px-4 md:px-6 py-4 text-neutral-500 hidden md:table-cell">{user.lastActive}</td>
                 <td class="px-4 md:px-6 py-4">
                   <div class="flex items-center justify-end gap-1">
-                    <button on:click={() => openEditModal(user)} class="p-2 text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-lg transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none" title="Edit" aria-label="Edit {user.name}">
+                    <button onclick={() => openEditModal(user)} class="p-2 text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-lg transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none" title="Edit" aria-label="Edit {user.name}">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M21.174 6.812a1 1 0 0 0-3.986-3.987L3.842 16.174a2 2 0 0 0-.5.83l-1.321 4.352a.5.5 0 0 0 .623.622l4.353-1.32a2 2 0 0 0 .83-.497z" />
                       </svg>
                     </button>
-                    <button on:click={() => openDeleteModal(user)} class="p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors focus:ring-2 focus:ring-red-400 focus:outline-none" title="Delete" aria-label="Delete {user.name}">
+                    <button onclick={() => openDeleteModal(user)} class="p-2 text-neutral-400 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors focus:ring-2 focus:ring-red-400 focus:outline-none" title="Delete" aria-label="Delete {user.name}">
                       <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M3 6h18" /><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6" /><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2" /><line x1="10" x2="10" y1="11" y2="17" /><line x1="14" x2="14" y1="11" y2="17" />
                       </svg>
@@ -335,18 +335,20 @@
 
   <!-- Add User Modal -->
   {#if addModalOpen}
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" on:click={closeAddModal} role="dialog" aria-modal="true" aria-labelledby="add-modal-title">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in" on:click|stopPropagation>
+    <!-- svelte-ignore a11y_interactive_supports_focus -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" onclick={closeAddModal} role="dialog" aria-modal="true" aria-labelledby="add-modal-title">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in" >
         <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
           <h2 id="add-modal-title" class="text-lg font-semibold text-black">Add New User</h2>
-          <button on:click={closeAddModal} class="p-2 text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-lg transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none" aria-label="Close modal">
+          <button onclick={closeAddModal} class="p-2 text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-lg transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none" aria-label="Close modal">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <form on:submit={handleAddUser} class="p-6 space-y-4">
+        <form onsubmit={handleAddUser} class="p-6 space-y-4">
           <div>
             <label for="add-name" class="block text-sm font-medium text-neutral-700 mb-1">Full Name *</label>
             <input id="add-name" type="text" bind:value={formData.name} required placeholder="e.g., John Doe" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
@@ -382,7 +384,7 @@
           </div>
 
           <div class="flex gap-3 pt-4">
-            <button type="button" on:click={closeAddModal} class="flex-1 px-4 py-2.5 border border-neutral-200 text-neutral-700 rounded-xl hover:bg-neutral-50 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"> Cancel </button>
+            <button type="button" onclick={closeAddModal} class="flex-1 px-4 py-2.5 border border-neutral-200 text-neutral-700 rounded-xl hover:bg-neutral-50 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"> Cancel </button>
             <button type="submit" class="flex-1 px-4 py-2.5 bg-black text-white rounded-xl hover:bg-neutral-800 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"> Invite User </button>
           </div>
         </form>
@@ -392,18 +394,20 @@
 
   <!-- Edit User Modal -->
   {#if editModalOpen}
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" on:click={closeEditModal} role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in" on:click|stopPropagation>
+    <!-- svelte-ignore a11y_interactive_supports_focus -->
+    <!-- svelte-ignore a11y_click_events_have_key_events -->
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" onclick={closeEditModal} role="dialog" aria-modal="true" aria-labelledby="edit-modal-title">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
         <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">
           <h2 id="edit-modal-title" class="text-lg font-semibold text-black">Edit User</h2>
-          <button on:click={closeEditModal} class="p-2 text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-lg transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none" aria-label="Close modal">
+          <button onclick={closeEditModal} class="p-2 text-neutral-400 hover:text-black hover:bg-neutral-100 rounded-lg transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none" aria-label="Close modal">
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
         </div>
 
-        <form on:submit={handleEditUser} class="p-6 space-y-4">
+        <form onsubmit={handleEditUser} class="p-6 space-y-4">
           <div>
             <label for="edit-name" class="block text-sm font-medium text-neutral-700 mb-1">Full Name *</label>
             <input id="edit-name" type="text" bind:value={formData.name} required placeholder="e.g., John Doe" class="w-full px-4 py-2.5 border border-neutral-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-neutral-900/20 focus:border-black transition-all bg-white" />
@@ -438,7 +442,7 @@
           </div>
 
           <div class="flex gap-3 pt-4">
-            <button type="button" on:click={closeEditModal} class="flex-1 px-4 py-2.5 border border-neutral-200 text-neutral-700 rounded-xl hover:bg-neutral-50 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"> Cancel </button>
+            <button type="button" onclick={closeEditModal} class="flex-1 px-4 py-2.5 border border-neutral-200 text-neutral-700 rounded-xl hover:bg-neutral-50 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"> Cancel </button>
             <button type="submit" class="flex-1 px-4 py-2.5 bg-black text-white rounded-xl hover:bg-neutral-800 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"> Save Changes </button>
           </div>
         </form>
@@ -448,8 +452,8 @@
 
   <!-- Delete Confirmation Modal -->
   {#if deleteModalOpen}
-    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" on:click={closeDeleteModal} role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
-      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in" on:click|stopPropagation>
+    <div class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in" onclick={closeDeleteModal} role="dialog" aria-modal="true" aria-labelledby="delete-modal-title">
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in">
         <div class="px-6 py-4 border-b border-neutral-200">
           <h2 id="delete-modal-title" class="text-lg font-semibold text-black">Confirm Delete</h2>
         </div>
@@ -469,8 +473,8 @@
           </div>
 
           <div class="flex gap-3">
-            <button on:click={closeDeleteModal} class="flex-1 px-4 py-2.5 border border-neutral-200 text-neutral-700 rounded-xl hover:bg-neutral-50 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"> Cancel </button>
-            <button on:click={handleDeleteUser} class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium focus:ring-2 focus:ring-red-400 focus:outline-none"> Remove User </button>
+            <button onclick={closeDeleteModal} class="flex-1 px-4 py-2.5 border border-neutral-200 text-neutral-700 rounded-xl hover:bg-neutral-50 transition-colors font-medium focus:ring-2 focus:ring-neutral-400 focus:outline-none"> Cancel </button>
+            <button onclick={handleDeleteUser} class="flex-1 px-4 py-2.5 bg-red-600 text-white rounded-xl hover:bg-red-700 transition-colors font-medium focus:ring-2 focus:ring-red-400 focus:outline-none"> Remove User </button>
           </div>
         </div>
       </div>

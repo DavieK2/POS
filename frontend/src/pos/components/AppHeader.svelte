@@ -11,17 +11,17 @@
   <span class="font-['Syne',sans-serif] font-extrabold text-[20px] tracking-[0.2em] uppercase">Vine</span>
 
   <div class="flex items-center gap-3">
-    <span class="font-['DM_Mono',monospace] text-[14px] text-zinc-500 min-w-42.5 text-right">
+    <span class="text-xs text-zinc-500 min-w-42.5 text-right">
       {dateString} &bull; {timeString}
     </span>
 
     <div class="w-px h-5.5 bg-zinc-200"></div>
 
     <div class="flex items-center gap-2 p-[4px_10px_4px_4px] border border-zinc-200 rounded-full bg-neutral-50">
-      <div class="w-6.5 h-6.5 rounded-full bg-[#0A0A0A] flex items-center justify-center text-white text-[11px] font-bold tracking-[0.05em]">
+      <div class="w-6.5 h-6.5 rounded-full bg-[#0A0A0A] flex items-center justify-center text-white text-[12px] font-bold tracking-[0.05em]">
         AJ
       </div>
-      <span class="text-[14px] font-semibold text-zinc-700">Alex J.</span>
+      <span class="text-xs font-semibold text-zinc-700">Alex J.</span>
     </div>
 
     <button

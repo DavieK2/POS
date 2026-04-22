@@ -220,7 +220,7 @@
 
   <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
     <div>
-      <h1 class="text-2xl md:text-3xl font-bold text-black mb-1">Inventory Management</h1>
+      <h1 class="text-xl md:text-xl font-bold text-black mb-1">Inventory Management</h1>
       <p class="text-neutral-500 text-sm">Manage your product catalog and stock levels</p>
     </div>
     <div class="flex gap-3">

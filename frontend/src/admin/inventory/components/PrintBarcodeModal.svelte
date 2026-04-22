@@ -4,7 +4,7 @@
   import { BASE_URL } from "../../../utils";
   import { showToast } from "../../../lib/toast";
   import Button from "../../../shared/button.svelte";
-  import type { DropDownOptions, Product } from "../../../shared/types";
+  import type { DropDownOptions, PrinterData, Product } from "../../../shared/types";
 
   let {
     closePrintBarcodeModal,
@@ -14,12 +14,7 @@
     currentProduct: Product;
   } = $props();
 
-  interface PrinterData {
-    deviceId: string;
-    name: string;
-    paperSizes: string[];
-  }
-
+  
   let printers: DropDownOptions[] = $state([]);
   let printersRaw: PrinterData[] = $state([]);
   let printQuantity = $state(1);
@@ -41,7 +36,6 @@
 
     if (!req.ok) {
       const res = await req.json();
-      console.log(res);
       showToast(res.message);
       return;
     }

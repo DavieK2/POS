@@ -7,7 +7,7 @@
   <div class="flex-1 overflow-auto bg-neutral-50/30">
     <div class="p-4 md:p-8 max-w-7xl mx-auto fade-in">
       <div class="mb-8">
-        <h1 class="text-2xl md:text-3xl font-bold text-black mb-1">Settings</h1>
+        <h1 class="text-xl md:text-xl font-bold text-black mb-1">Settings</h1>
         <p class="text-neutral-500 text-sm">Manage your hardware preferences and account security</p>
       </div>
 

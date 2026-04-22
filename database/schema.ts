@@ -20,6 +20,29 @@ export class CategorySchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class OrderSchema extends BaseModel {
+  static $columns = ['createdAt', 'discount', 'id', 'items', 'note', 'paymentMethod', 'status', 'updatedAt', 'userId'] as const
+  $columns = OrderSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare discount: number | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare items: any | null
+  @column()
+  declare note: string | null
+  @column()
+  declare paymentMethod: string | null
+  @column()
+  declare status: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column()
+  declare userId: string
+}
+
 export class ProductSchema extends BaseModel {
   static $columns = ['barcode', 'barcodeImage', 'categoryId', 'createdAt', 'description', 'id', 'price', 'productCode', 'productImage', 'productName', 'quantity', 'updatedAt'] as const
   $columns = ProductSchema.$columns

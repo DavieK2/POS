@@ -6,6 +6,8 @@ import { resolve } from 'node:path'
 
 const mapping = {
   product: ['products', 'categories'],
+  orders: ['orders'],
+  user: ['users']
 }
 
 const DB_PATH = resolve('tmp/db.sqlite3')
