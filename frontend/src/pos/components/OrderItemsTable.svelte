@@ -87,13 +87,13 @@
               <p class="text-xs text-zinc-400 mt-px">{item.category}</p>
             </td>
             <td class="py-2 px-2">
-              <div class="font-['DM_Mono',monospace] text-sm font-medium text-zinc-600">{fmt(item.price)}</div>
+              <div class="text-sm font-medium text-zinc-600">{fmt(item.price)}</div>
             </td>
             <td class="py-2 px-2 text-center">
-              <div class="font-['DM_Mono',monospace] text-sm font-medium text-zinc-700">{item.qty}</div>
+              <div class="text-sm font-medium text-zinc-700">{item.qty}</div>
             </td>
             <td class="py-2 pl-2 pr-4 text-right">
-              <div class="font-['DM_Mono',monospace] text-sm font-medium text-[#0A0A0A]">{fmt(item.price * item.qty)}</div>
+              <div class="text-sm font-medium text-[#0A0A0A]">{fmt(item.price * item.qty)}</div>
             </td>
           </tr>
         {/each}
