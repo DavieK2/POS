@@ -67,7 +67,7 @@
       disabled={isEmpty || isHeld}
       class="px-8 py-2.5 h-20 flex flex-col items-center justify-center rounded-2xl font-bold text-xl transition-all
              {isEmpty || isHeld
-               ? 'bg-zinc-300 text-zinc-400 cursor-not-allowed'
+               ? 'bg-zinc-50 text-zinc-400 cursor-not-allowed'
                : 'bg-yellow-500/50 text-black hover:bg-yellow-500/40 active:scale-95 cursor-pointer'}"
     >
       Pay

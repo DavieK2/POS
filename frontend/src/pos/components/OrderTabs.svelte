@@ -61,7 +61,7 @@
 
     <button
       onclick={(e) => { e.stopPropagation(); onShowHistory(); }}
-      class="text-zinc-500 border-none rounded-[7px] p-[5px_14px] text-sm font-medium cursor-pointer flex items-center gap-1.25 hover:bg-black/5 transition-colors"
+      class="text-zinc-700 border-none rounded-[7px] p-[5px_14px] text-sm font-medium cursor-pointer flex items-center gap-1.25 hover:bg-black/5 transition-colors"
     >
       <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
         <circle cx="12" cy="12" r="10" />
