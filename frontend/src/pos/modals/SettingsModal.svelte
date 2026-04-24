@@ -27,8 +27,8 @@
     setTimeout(async () => {
       const req = await fetch(`${BASE_URL}/printers`);
       const res: PrinterData[] = await req.json();
-      const getPrinterFromCache = localStorage.getItem("selectedPrinter")
-      const getSelectedPaperSizeFromCache = localStorage.getItem("paperSize")
+      const getPrinterFromCache = localStorage.getItem("receiptPrinter")
+      const getSelectedPaperSizeFromCache = localStorage.getItem("receiptPageSize")
 
       console.log(getSelectedPaperSizeFromCache);
       
@@ -83,7 +83,7 @@
            <!-- Paper size dropdown -->
             <div class="space-y-2">
               <label for="papersize" class="block text-sm font-semibold text-neutral-700 mt-2">Paper Size</label>
-              <Dropdown selected={selectedPaperSize} options={paperSizeOptions} onSelect={(option) => localStorage.setItem('paperSize', option.value)} />
+              <Dropdown selected={selectedPaperSize} options={paperSizeOptions} onSelect={(option) => localStorage.setItem('receiptPageSize', option.value)} />
             </div>
         </div>
       {/if}
@@ -92,7 +92,7 @@
     <!-- Actions -->
     <div class="flex gap-2">
       <button onclick={onClose} class="flex-1 py-2.5 rounded-xl border border-zinc-200 text-[14px] font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"> Close </button>
-      <button onclick={() => { localStorage.setItem("selectedPrinter", selectedPrinter.value ); onSave("Printer settings saved") }} class="flex-1 py-2.5 rounded-xl bg-[#0A0A0A] text-white text-[14px] font-semibold hover:opacity-80 active:scale-95 transition-all"> Save Changes </button>
+      <button onclick={() => { localStorage.setItem("receiptPrinter", selectedPrinter.value ); onSave("Printer settings saved") }} class="flex-1 py-2.5 rounded-xl bg-[#0A0A0A] text-white text-[14px] font-semibold hover:opacity-80 active:scale-95 transition-all"> Save Changes </button>
     </div>
   </div>
 </div>

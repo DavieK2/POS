@@ -27,8 +27,80 @@ export interface Registry {
       paramsTuple: []
       params: {}
       query: {}
-      response: unknown
-      errorResponse: unknown
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/auth/controllers/authentication_controller').default['signIn']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/auth/controllers/authentication_controller').default['signIn']>>>
+    }
+  }
+  'authentication.get_auth_user': {
+    methods: ["GET"]
+    pattern: '/auth/me'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/auth/controllers/authentication_controller').default['getAuthUser']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/auth/controllers/authentication_controller').default['getAuthUser']>>>
+    }
+  }
+  'authentication.sign_out': {
+    methods: ["POST"]
+    pattern: '/auth/logout'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/auth/controllers/authentication_controller').default['signOut']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/auth/controllers/authentication_controller').default['signOut']>>>
+    }
+  }
+  'order.get_orders': {
+    methods: ["GET"]
+    pattern: '/orders'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/orders/controllers/order_controller').default['getOrders']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/orders/controllers/order_controller').default['getOrders']>>>
+    }
+  }
+  'order.create_order': {
+    methods: ["POST"]
+    pattern: '/order/create'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/orders/controllers/order_controller').default['createOrder']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/orders/controllers/order_controller').default['createOrder']>>>
+    }
+  }
+  'order.update_order': {
+    methods: ["PATCH"]
+    pattern: '/order/update/:order'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { order: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/orders/controllers/order_controller').default['updateOrder']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/orders/controllers/order_controller').default['updateOrder']>>>
+    }
+  }
+  'order.print_order': {
+    methods: ["POST"]
+    pattern: '/order/print'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#modules/orders/controllers/order_controller').default['printOrder']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#modules/orders/controllers/order_controller').default['printOrder']>>>
     }
   }
   'printer.get_printers': {

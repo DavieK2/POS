@@ -157,11 +157,11 @@
             {/if}
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-semibold text-[#0A0A0A] truncate leading-snug">{p.productName}</p>
+            <p class="text-sm font-medium text-[#0A0A0A] truncate leading-snug">{p.productName}</p>
             <p class="text-xs text-zinc-400 mt-0.5"><span class="font-['DM_Mono',monospace]">SKU:{p.barcode}</span></p>
           </div>
           <div class="flex items-center gap-2 shrink-0">
-            <span class="font-['DM_Mono',monospace] text-xs font-medium text-zinc-600">{formatCurrency(p.price)}</span>
+            <span class="text-xs font-medium text-zinc-600">&#8358{formatCurrency(p.price)}</span>
             <div class="w-6 h-6 bg-zinc-200 group-hover:bg-[#0A0A0A] rounded-full flex items-center justify-center shrink-0 transition-colors" aria-hidden="true">
               <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" class="text-zinc-500 group-hover:text-white transition-colors"><line x1="12" y1="5" x2="12" y2="19" /><line x1="5" y1="12" x2="19" y2="12" /></svg>
             </div>
@@ -176,7 +176,7 @@
           {@const count = cat.productCount}
           <button onclick={() => selectCategory(cat)} disabled={isHeld || !activeOrder} class="group relative flex flex-col p-3 rounded-[14px] border border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-sm transition-all text-left overflow-hidden active:scale-[0.98] disabled:active:scale-100" aria-label="Browse {cat.categoryName} category — {count} items">
             <div class="flex items-start justify-between mb-2.5">
-              <div class="w-10 h-10 rounded-[10px] flex items-center bg-zinc-500 justify-center text-lg text-white font-bold shrink-0">
+              <div class="w-10 h-10 rounded-lg flex items-center bg-zinc-800/95 justify-center text-lg text-white font-bold shrink-0">
                 {cat.categoryName.charAt(0).toUpperCase()}
               </div>
               <span class="text-[10px] font-bold text-white rounded-full h-5 w-5 bg-zinc-300 flex items-center justify-center shrink-0">{count}</span>

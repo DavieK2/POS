@@ -3,7 +3,7 @@
 
   interface Props {
     activeOrder: Order | null;
-    onConfirm: () => void;
+    onConfirm: (order: Order) => void;
     onClose: () => void;
   }
   let { activeOrder, onConfirm, onClose }: Props = $props();
@@ -30,7 +30,7 @@
 
     <h3 id="cancel-modal-title" class="text-lg font-bold text-[#0A0A0A] mb-2">Cancel Order?</h3>
     <p class="text-sm text-zinc-500 mb-6">
-      Are you sure you want to cancel Order #{activeOrder?.id}? This action cannot be undone.
+      Are you sure you want to cancel Order #{activeOrder?.orderId}? This action cannot be undone.
     </p>
 
     <div class="flex gap-2">
@@ -41,7 +41,7 @@
         Keep Order
       </button>
       <button
-        onclick={onConfirm}
+        onclick={ () => onConfirm(activeOrder!)}
         class="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 active:scale-95 transition-all"
       >
         Cancel Order

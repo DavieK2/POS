@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
-  import { BASE_URL } from "../../utils";
-  import type { Category, DropDownOptions, PrinterData } from "../../shared/types";
+  import { api, BASE_URL } from "../../utils";
+  import type { Category } from "../../shared/types";
 
   // Components
   import BarcodePanel from "../components/BarcodePanel.svelte";
@@ -23,8 +23,10 @@
   import SettingsModal from "../modals/SettingsModal.svelte";
 
   // Utils & types
-  import type { Order, PastOrder, PaymentMethod, ActiveOrderItem } from "./types";
-  import { fmt, orderSubtotal, orderTotal } from "./utils";
+  import type { Order, PaymentMethod, ActiveOrderItem } from "./types";
+  import { orderSubtotal, orderTotal } from "./utils";
+  import PrintReceiptModal from "../modals/PrintReceiptModal.svelte";
+  import { active } from "@mateothegreat/svelte5-router";
 
   // ─── Clock ───────────────────────────────────────────────────────────────────
   const initDate = new Date();
@@ -50,8 +52,11 @@
 
   onMount(async () => {
     await getCategories();
+    await getTabOrders();
   });
 
+  const pageSize = $state(localStorage.getItem("receiptPageSize"));
+  const printer = $state(localStorage.getItem("receiptPrinter"));
   // ─── Remote data ─────────────────────────────────────────────────────────────
   let categories = $state<Category[]>([]);
 
@@ -63,15 +68,13 @@
   // ─── Orders state ────────────────────────────────────────────────────────────
   let nextNum = $state<number>(8824);
 
-  let orders = $state<Order[]>([]);
-
-  let pastOrders = $state<PastOrder[]>([]);
+  // let orders = $state<Order[]>([]);
 
   let activeOrder = $state<Order | null>(null);
+  let tabOrders = $state<Order[]>([]);
 
   // ─── Derived order state ──────────────────────────────────────────────────────
   let hasActiveOrder = $derived(!!activeOrder);
-  let tabOrders = $derived(orders.filter((o) => o.status === "held" || o.status === "active"));
   let subtotal = $derived<number>(activeOrder ? orderSubtotal(activeOrder) : 0);
   let total = $derived<number>(activeOrder ? orderTotal(activeOrder) : 0);
   let isEmpty = $derived<boolean>(!activeOrder || activeOrder.items.length === 0);
@@ -94,12 +97,23 @@
 
   // ─── Order actions ────────────────────────────────────────────────────────────
 
+  const getTabOrders = async () => {
+    await api({
+      url: "/orders?query=held,active",
+      method: "GET",
+      onSuccess: (data) => {
+        tabOrders = data;
+      },
+      withAuth: true,
+    });
+  };
+
   function selectOrder(order: Order): void {
     if (isLocked) {
       showToast("Please hold the current order before switching.");
       return;
     }
-    const found = orders.find((o) => o.id === order.id);
+    const found = tabOrders.find((o) => o.id === order.id);
     if (!found) return;
     activeOrder = found;
     if (activeOrder.status === "held") {
@@ -107,9 +121,7 @@
     }
   }
 
-  function newOrder(): void {
-    console.log($state.snapshot(orders));
-
+  async function newOrder(): Promise<void> {
     if (isLocked) {
       showToast("Please hold the current order before creating a new one.");
       return;
@@ -125,11 +137,21 @@
       discount: 0,
     };
 
-    orders.push(order);
-    activeOrder = orders[orders.length - 1];
+    await api({
+      url: "/order/create",
+      method: "POST",
+      onSuccess: (data) => {
+        order.orderId = data.orderId;
+        order.id = data.id;
+        tabOrders.push(order);
+        activeOrder = tabOrders[tabOrders.length - 1];
+      },
+      onFail: (res) => showToast(res.message),
+      withAuth: true,
+    });
   }
 
-  const addItemToOrder = (p: ActiveOrderItem): void => {
+  const addItemToOrder = async (p: ActiveOrderItem): Promise<void> => {
     if (!activeOrder) return;
 
     if (isHeld) {
@@ -140,37 +162,131 @@
     const existing = activeOrder.items.find((item) => item.id === p.id);
 
     if (existing) {
+      const qty = existing.qty;
       existing.qty += 1;
       activeOrder.currentSelectedItem = existing;
+
+      await api({
+        url: `/order/update/${activeOrder.id}`,
+        method: "PATCH",
+        withAuth: true,
+        body: {
+          items: activeOrder.items.flatMap((i) => [{ productId: i.id, qty: i.qty }]),
+        },
+        onSuccess: (_) => showToast("Quantity updated."),
+        onFail: (res) => {
+          existing.qty = qty;
+          showToast(res.message);
+        },
+      });
     } else {
       const newItem = { ...p, qty: 1 };
       activeOrder.items.push(newItem);
       activeOrder.currentSelectedItem = activeOrder.items[activeOrder.items.length - 1];
+
+      await api({
+        url: `/order/update/${activeOrder.id}`,
+        method: "PATCH",
+        withAuth: true,
+        body: {
+          items: activeOrder.items.flatMap((i) => [{ productId: i.id, qty: i.qty }]),
+        },
+        onSuccess: (_) => showToast("Item successfully added"),
+        onFail: (res) => {
+          activeOrder!.items = activeOrder!.items.filter((i) => i.id !== newItem.id);
+          activeOrder!.currentSelectedItem = activeOrder!.items[activeOrder!.items.length - 1];
+          showToast(res.message);
+        },
+      });
     }
   };
 
-  function removeItem(product: ActiveOrderItem): void {
+  async function removeItem(product: ActiveOrderItem): Promise<void> {
     if (!activeOrder || isHeld) return;
+
     activeOrder.items = activeOrder.items.filter((item) => item.id !== product.id);
     activeOrder.currentSelectedItem = activeOrder.items[0] ?? null;
+
+    await api({
+      url: `/order/update/${activeOrder.id}`,
+      method: "PATCH",
+      withAuth: true,
+      body: {
+        items: activeOrder.items.flatMap((i) => [{ productId: i.id, qty: i.qty }]),
+      },
+      onSuccess: (res) => showToast(res.message),
+      onFail: (res) => showToast(res.message),
+    });
   }
 
-  function incQty(product: ActiveOrderItem): void {
+  async function incQty(product: ActiveOrderItem): Promise<void> {
     if (!activeOrder || isHeld) return;
+
     const existing = activeOrder.items.find((item) => item.id === product.id);
-    if (existing) existing.qty += 1;
+
+    if (!existing) return;
+
+    const qty = existing.qty;
+    existing.qty += 1;
+
+    await api({
+      url: `/order/update/${activeOrder.id}`,
+      method: "PATCH",
+      withAuth: true,
+      body: {
+        items: activeOrder.items.flatMap((i) => [{ productId: i.id, qty: i.qty }]),
+      },
+      onSuccess: (res) => showToast(res.message),
+      onFail: (res) => {
+        existing.qty = qty;
+        showToast(res.message);
+      },
+    });
   }
 
-  function decQty(product: ActiveOrderItem): void {
+  async function decQty(product: ActiveOrderItem): Promise<void> {
     if (!activeOrder || isHeld) return;
     const existing = activeOrder.items.find((item) => item.id === product.id);
+
     if (!existing || existing.qty === 1) return;
+
+    const qty = existing.qty;
     existing.qty -= 1;
+
+    await api({
+      url: `/order/update/${activeOrder.id}`,
+      method: "PATCH",
+      withAuth: true,
+      body: {
+        items: activeOrder.items.flatMap((i) => [{ productId: i.id, qty: i.qty }]),
+      },
+      onSuccess: (res) => showToast(res.message),
+      onFail: (res) => {
+        existing.qty = qty;
+        showToast(res.message);
+      },
+    });
   }
 
-  function holdOrder(): void {
+  async function holdOrder(): Promise<void> {
     if (!activeOrder) return;
+
+    const status = activeOrder.status;
     activeOrder.status = activeOrder.status === "held" ? "active" : "held";
+
+    await api({
+      url: `/order/update/${activeOrder.id}`,
+      method: "PATCH",
+      withAuth: true,
+      body: {
+        items: activeOrder.items.flatMap((i) => [{ productId: i.id, qty: i.qty }]),
+      },
+      onSuccess: (_) => showToast("Order has been held"),
+      onFail: (res) => {
+        activeOrder!.status = status;
+        showToast(res.message);
+      },
+    });
   }
 
   function openNumpad(product: ActiveOrderItem): void {
@@ -178,10 +294,29 @@
     activeOrder.currentSelectedItem = product;
   }
 
-  const updateItemQty = (product: ActiveOrderItem, qty: number): void => {
+  const updateItemQty = async (product: ActiveOrderItem, qty: number): Promise<void> => {
     if (!activeOrder || isHeld) return;
+
     const existing = activeOrder.items.find((item) => item.id === product.id);
-    if (existing) existing.qty = qty;
+
+    if (!existing) return;
+
+    const quantity = existing.qty;
+    existing.qty = qty;
+
+    await api({
+      url: `/order/update/${activeOrder.id}`,
+      method: "PATCH",
+      withAuth: true,
+      body: {
+        items: activeOrder.items.flatMap((i) => [{ productId: i.id, qty: i.qty }]),
+      },
+      onSuccess: (res) => showToast(res.message),
+      onFail: (res) => {
+        existing.qty = quantity;
+        showToast(res.message);
+      },
+    });
   };
 
   // ─── Modal state ─────────────────────────────────────────────────────────────
@@ -192,8 +327,10 @@
   let showPayModal = $state<boolean>(false);
   let showPayConfirm = $state<boolean>(false);
   let showSettingsModal = $state<boolean>(false);
+  let showPrintReceipt = $state<boolean>(false);
+    
 
-  let anyModalOpen = $derived<boolean>(showPayModal || showPayConfirm || showCancelModal || showNoteModal || showDiscountModal || showHistoryModal || showSettingsModal);
+  let anyModalOpen = $derived<boolean>(showPayModal || showPayConfirm || showCancelModal || showNoteModal || showDiscountModal || showHistoryModal || showSettingsModal || showPrintReceipt);
 
   // Note modal
   let draftNote = $state<string>("");
@@ -216,31 +353,66 @@
     showDiscountModal = true;
   }
 
-  function saveDiscount(): void {
-    if (activeOrder) {
-      const parsed = parseInt(String(draftDiscount).replace(/[^0-9]/g, ""));
-      activeOrder.discount = isNaN(parsed) ? 0 : Math.min(parsed, subtotal);
-    }
+  async function saveDiscount(): Promise<void> {
+    if (!activeOrder) return;
+
+    const parsed = parseFloat(String(draftDiscount).replace(/[^0-9.]/g, ""));
+
+    const discount = activeOrder.discount;
+    activeOrder.discount = isNaN(parsed) ? 0 : Math.min(parsed, subtotal);
+
+    await api({
+      url: `/order/update/${activeOrder.id}`,
+      method: "PATCH",
+      withAuth: true,
+      body: {
+        discount: activeOrder.discount.toString(),
+      },
+      onSuccess: (_) => showToast("Discount successfully added"),
+      onFail: (res) => {
+        activeOrder!.discount = discount;
+        showToast(res.message);
+      },
+    });
+
     showDiscountModal = false;
   }
 
-  // Cancel modal
   function openCancel(): void {
     if (activeOrder && !isHeld) showCancelModal = true;
   }
-  function confirmCancel(): void {
+
+  async function confirmCancel(order: Order): Promise<void> {
     if (!activeOrder) return;
 
-    const currentOrder = orders.find((o) => o.id === activeOrder!.id);
+    const currentOrder = tabOrders.find((o) => o.id === order!.id);
     if (!currentOrder) return;
 
+    const status = currentOrder.status;
+
     currentOrder.status = "cancelled";
-    activeOrder = null;
+
+    await api({
+      url: `/order/update/${activeOrder!.id}`,
+      method: "PATCH",
+      withAuth: true,
+      body: {
+        status: currentOrder!.status,
+      },
+      onSuccess: (_) => {
+        activeOrder = null;
+        showToast("Order has been cancelled");
+        getTabOrders()
+      },
+      onFail: (res) => {
+        currentOrder!.status = status;
+        showToast(res.message);
+      },
+    });
 
     showCancelModal = false;
   }
 
-  // Pay modals
   let payMethod = $state<PaymentMethod>("cash");
 
   function openPay(): void {
@@ -258,25 +430,76 @@
   function selectPaymentMethod(method: PaymentMethod) {
     if (!activeOrder) return;
 
-    const currentOrder = orders.find((o) => o.id === activeOrder!.id);
+    const currentOrder = tabOrders.find((o) => o.id === activeOrder!.id);
     if (!currentOrder) return;
 
     currentOrder.paymentMethod = method;
     payMethod = method;
   }
 
-  function processPayment(): void {
+  async function processPayment(withPrinting: boolean = false): Promise<void> {
+
+    if (withPrinting && !printer && ! pageSize) {
+      showToast("Please set up the printer.");
+      return;
+    }
+
     if (!activeOrder) return;
-    const currentOrder = orders.find((o) => o.id === activeOrder!.id);
+    const currentOrder = tabOrders.find((o) => o.id === activeOrder!.id);
     if (!currentOrder) return;
+
+    const paymentStatus = currentOrder.status;
     currentOrder.status = "paid";
-    activeOrder = null;
-    showPayConfirm = false;
+
+    await api({
+      url: `/order/update/${activeOrder!.id}`,
+      method: "PATCH",
+      withAuth: true,
+      body: {
+        status: currentOrder!.status,
+        paymentMethod: payMethod,
+      },
+      onSuccess: async (_) => {
+
+        showToast("Order has been confirmed");
+
+        if (withPrinting)  await printReceipt(activeOrder!)
+        
+        showPayConfirm = false;
+        activeOrder = null;
+        await getTabOrders();
+      },
+      onFail: (res) => {
+        currentOrder!.status = paymentStatus;
+        showToast(res.message);
+      },
+    });
   }
 
-  function confirmPayAndPrint(): void {
-    processPayment();
-    showToast("Printing receipt…");
+  async function confirmPayAndPrint(): Promise<void> {
+    await processPayment(true);
+  }
+
+  async function printReceipt(order: Order){
+    if ( !printer && ! pageSize) {
+      showToast("Please set up the printer.");
+      return;
+    }
+    await api({
+            url: "/order/print",
+            method: "POST",
+            withAuth: true,
+            body: {
+              orderId:order.id,
+              printer,
+              pageSize,
+            },
+            onSuccess: (res) => {
+              activeOrder = null;
+              showToast(res.message);
+            },
+            onFail: (res) => showToast(res.message),
+          });
   }
 
   function openSettings(): void {
@@ -290,10 +513,10 @@
   let searchMode = $state<"catalog" | "barcode">("barcode");
 
   $effect(() => {
-    if( ! activeOrder ){
-        searchMode = "barcode"
+    if (!activeOrder) {
+      searchMode = "barcode";
     }
-  })
+  });
 </script>
 
 <AppToast message={toast} />
@@ -310,7 +533,7 @@
   aria-label="Vine POS"
 >
   <div inert={anyModalOpen || undefined}>
-    <AppHeader {dateString} {timeString} onOpenSettings={openSettings} />
+    <AppHeader {showToast} {dateString} {timeString} onOpenSettings={openSettings} />
   </div>
 
   <main class="flex flex-1 overflow-hidden min-h-0" inert={anyModalOpen || undefined}>
@@ -391,7 +614,7 @@
     {total}
     {payMethod}
     onConfirmAndPrint={confirmPayAndPrint}
-    onConfirm={processPayment}
+    onConfirm={() => processPayment(false)}
     onClose={() => {
       showPayConfirm = false;
       showPayModal = true;
@@ -400,7 +623,7 @@
 {/if}
 
 {#if showCancelModal && activeOrder}
-  <CancelModal {activeOrder} onConfirm={confirmCancel} onClose={() => (showCancelModal = false)} />
+  <CancelModal {activeOrder} onConfirm={(order) => confirmCancel(order)} onClose={() => (showCancelModal = false)} />
 {/if}
 
 {#if showNoteModal && activeOrder}
@@ -412,12 +635,18 @@
 {/if}
 
 {#if showHistoryModal}
-  <HistoryModal {pastOrders} onClose={() => (showHistoryModal = false)} onPrintReceipt={(id) => showToast(`Printing receipt for Order #${id}…`)} />
+  <HistoryModal onClose={() => (showHistoryModal = false)} onPrintReceipt={ async (order) => { await printReceipt(order); showToast(`Printing receipt for Order #${order.orderId}…`) }} />
 {/if}
 
 {#if showSettingsModal}
   <SettingsModal {showToast} onSave={saveSettings} onClose={() => (showSettingsModal = false)} />
 {/if}
+
+<!-- {#if showPrintReceipt }
+  <PrintReceiptModal {total} {payMethod} {activeOrder} onPrintReceipt={ (order) => {}} onClose={() => (showPrintReceipt = false)} />
+{/if} -->
+
+
 
 <style>
   [inert] {

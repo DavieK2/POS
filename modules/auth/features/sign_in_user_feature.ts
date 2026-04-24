@@ -8,21 +8,29 @@ import User from "#modules/user/models/user";
 import { pipe } from "fp-ts/lib/function.js";
 
 const rules = type({
-    email: 'string & string.email',
-    password: 'string',
-    loginType: type('string').optional(),
-    ipAddress: type('string').optional()
+    username: 'string & string > 0',
+    password: 'string'
 });
 
 type ParamsType = typeof rules.infer
 
 export default class SignInUserFeature extends BaseFeature<TError, any> {
 
-    async handle(params: ParamsType ): Promise<E.Either<TError, any>> {
+    async handle(params: ParamsType): Promise<E.Either<TError, any>> {
           return await SignInUserFeature.use<typeof params, typeof params>(params)
-                                        .chain( (data, _) => ValidationService.validate({ rules, data }) )
-                                        .chainAndStore('user', (_, data) => this.verifyUserCredentials({ email: data.email, password: data.password }) )
-                                        .chain( (user, _) => this.verifyIfUserAccountIsDeleted(user) )
+                                        .chain((data, _) => ValidationService.validate({ rules, data }))
+                                        .chainAndStore('user', (_, data) => this.verifyUserCredentials({ username: data.username, password: data.password }))
+                                        .chain((user, _) => this.verifyIfUserAccountIsDeleted(user))
+                                        .chain((user, _) => this.generateUserLoginToken(user))
+                                        .chain((token, data) => TE.right({
+                                            message: "Logged in",
+                                            token,
+                                            user: {
+                                                userName: data.__user.userName,
+                                                fullName: data.__user.fullName,
+                                                role: data.__user.role
+                                            }
+                                        }))
                                         .catchErrors()
                                         .handle<TError>({
                                             'Default': (err: TError) => TE.left(err),
@@ -30,22 +38,32 @@ export default class SignInUserFeature extends BaseFeature<TError, any> {
                                         .run();
     }
 
-    verifyUserCredentials( opts: { email: string, password: string } ){
+    verifyUserCredentials(opts: { username: string, password: string }) {
 
         return TE.tryCatch(
-            () => User.verifyCredentials( opts.email, opts.password ),
-            (error) => AppErrors.HandledError( error, "Invalid user credentials.", 403 )
+            () => User.verifyCredentials(opts.username, opts.password),
+            (error) => AppErrors.HandledError(error, "Invalid user credentials.", 403)
         )
     }
 
-    verifyIfUserAccountIsDeleted( user: User ) : TE.TaskEither<ValidationErrorMessage, User>{
+    verifyIfUserAccountIsDeleted(user: User): TE.TaskEither<ValidationErrorMessage, User> {
 
         return pipe(
             user,
             TE.fromPredicate(
-                () => ! ( user && user.isDeleted ),
+                () => !(user && user.isDeleted),
                 () => AppErrors.ValidationErrorMessage("Invalid user credentials.")
             )
+        );
+    }
+    generateUserLoginToken = (user: User) => {
+
+        return pipe(
+            TE.tryCatch(
+                () => User.accessTokens.create(user),
+                (err) => AppErrors.UnhandledError(err, "There was an error.")
+            ),
+            TE.map(token => token.value?.release())
         );
     }
 }

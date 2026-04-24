@@ -31,14 +31,14 @@
     {#each otherOrders as o (o.id)}
       {@const t = orderTotal(o)}
       <button
-        class="flex items-center gap-2 bg-white border rounded-full px-3 h-9 whitespace-nowrap shrink-0 transition-all border-zinc-200
-               {isLocked ? 'opacity-40 cursor-not-allowed pointer-events-none grayscale' : 'hover:border-zinc-400'}"
+        class="flex items-center gap-2 bg-white border-2 rounded-full px-3 h-9 whitespace-nowrap shrink-0 transition-all 
+               {isLocked ? 'opacity-40 cursor-not-allowed pointer-events-none grayscale' : 'hover:border-zinc-400 border-zinc-500'}"
         onclick={(e) => { e.stopPropagation(); onSelectOrder(o); }}
-        aria-label="Switch to order #{o.id}"
+        aria-label="Switch to order #{o.orderId}"
       >
         <span class="w-2 h-2 rounded-full {o.status === 'held' ? 'bg-amber-500' : 'bg-green-500'} shrink-0 animate-pulse"></span>
-        <span class="text-sm text-zinc-500 font-medium pr-2 border-r border-zinc-200">#{o.id}</span>
-        <span class="text-sm font-medium text-zinc-500">
+        <span class="text-sm text-zinc-700 font-medium pr-2 border-r border-zinc-200">#{o.orderId}</span>
+        <span class="text-sm font-medium text-zinc-700">
           { fmt(t) }
         </span>
       </button>

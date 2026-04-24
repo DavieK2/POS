@@ -20,8 +20,8 @@
   let printQuantity = $state(1);
   let selectedPrinter = $state({ text: "Select a printer", value: "" });
   let selectedPaperSize = $state("");
-  let labelWidth = $state(4);
-  let labelHeight = $state(2);
+  let labelWidth = $state(1.90);
+  let labelHeight = $state(0.90);
 
   let paperSizeOptions: DropDownOptions[] = $derived(selectedPrinter.value ? printersRaw.find( p => p.deviceId === selectedPrinter.value )!.paperSizes.map((s) => ({ text: s, value: s })) : []);
 

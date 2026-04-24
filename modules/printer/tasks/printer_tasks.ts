@@ -1,175 +1,136 @@
-import AppErrors from '#exceptions/app_error';
-import pdfToPrinter from 'pdf-to-printer';
+import AppErrors, { ValidationErrorMessage } from '#exceptions/app_error';
+import pdfToPrinter, { Printer } from 'pdf-to-printer';
 import * as TE from 'fp-ts/lib/TaskEither.js';
-import { createCanvas, loadImage } from 'canvas';
-import fs from "node:fs";
-import path from "node:path";
-import os from "node:os";
+import * as A from 'fp-ts/lib/Array.js';
+import { ThermalPrinter, PrinterTypes } from 'node-thermal-printer';
+import { exec } from 'child_process';
+import fs from 'fs';
+import path from 'path';
+import { promisify } from 'util';
+import { pipe } from 'fp-ts/lib/function.js';
+import { PrintData } from '../types/printer_types.ts';
+import { formatCurrency } from '../../../app/tasks/base_tasks.ts';
 
+const execAsync = promisify(exec);
 
 export const getWindowsPrinters = () => {
-
     return TE.tryCatch(
         () => pdfToPrinter.getPrinters(),
         (err) => AppErrors.HandledError(err, "Could not fetch printers")
     )
-
 }
 
-export async function generateReceiptStream(p: { 
-    printer: string, 
-    pageSize: string, 
-    logoPath?: string, 
-    data: { 
-        storeName: string,
-        address: string,
-        date: string,
-        transactionId: string,
-        paymentMode: string,
-        printedBy: string,
-        items: Array<{ name: string, unitPrice: number, qty: number }>, 
-        subtotal: number,
-        discount: number,
-        total: number 
-    } 
-}) {
-    // 1. UNIT ADJUSTMENT: 226 points = ~80mm width.
-    const WIDTH = 226; 
-    const MARGIN = 12;
-    
-    // Dynamic height calculation (Units are smaller now)
-    const headerHeight = p.logoPath ? 160 : 100; 
-    const itemHeight = p.data.items.length * 35; // Each item block is ~35pts
-    const footerHeight = 150;
-    const dynamicHeight = headerHeight + itemHeight + footerHeight;
+export const validateIsValidPrinter = (p: { printers: Printer[], printer: string }): TE.TaskEither<ValidationErrorMessage, Printer> => {
+    return pipe(
+        p.printers,
+        A.findFirst(printer => printer.deviceId === p.printer),
+        TE.fromOption(() => AppErrors.ValidationErrorMessage("Invalid Printer"))
+    );
+}
 
-    // Create canvas in PDF mode
-    const canvas = createCanvas(WIDTH, dynamicHeight, 'pdf');
-    const ctx = canvas.getContext('2d');
+export const WindowsBinaryDriver = {
+    getPrinter: (printerName: string) => {
+        return { name: printerName.replace('printer:', '') };
+    },
 
-    ctx.fillStyle = '#000000';
-    ctx.textBaseline = 'top';
+    getPrinters: () => {
+        return [];
+    },
 
-    let currentY = 15;
+    printDirect: async (options: {
+        data: Buffer;
+        printer: string;
+        type: string;
+        success?: (jobId: number) => void;
+        error?: (err: Error) => void;
+    }) => {
+        const cleanName = options.printer.replace('printer:', '');
+        const escapedName = cleanName.replace(/'/g, "''");
+        const tempFile = path.resolve(`print_${Date.now()}.bin`);
 
-    // --- 1. Logo ---
-    if (p.logoPath && fs.existsSync(p.logoPath)) {
         try {
-            const logo = await loadImage(p.logoPath);
-            const logoWidth = 60; // Smaller logo for 80mm width
-            const logoHeight = (logo.height / logo.width) * logoWidth;
-            ctx.drawImage(logo, (WIDTH / 2) - (logoWidth / 2), currentY, logoWidth, logoHeight);
-            currentY += logoHeight + 10;
-        } catch (e) {
-            console.error("Logo failed to load, skipping.");
+            const { stdout } = await execAsync(
+                `powershell -NoProfile -Command "$p = Get-WmiObject -Class Win32_Printer -Filter 'Name=''${escapedName}'''; if (-not $p) { Write-Output 'NOT_FOUND' } elseif (-not $p.Shared) { Write-Output 'NOT_SHARED' } else { Write-Output 'SHARED' }"`
+            );
+            const status = stdout.trim();
+            if (status === 'NOT_FOUND') {
+                throw new Error(`Printer "${cleanName}" not found.`);
+            }
+            if (status === 'NOT_SHARED') {
+                throw new Error(`Printer "${cleanName}" is not shared. Please enable printer sharing in Windows.`);
+            }
+
+            fs.writeFileSync(tempFile, options.data);
+            await execAsync(`copy /B "${tempFile}" "\\\\localhost\\${cleanName}"`);
+
+            if (options.success) {
+                options.success(1);
+            }
+            return "Success";
+        } catch (err: any) {
+            const error = new Error(`Windows Spooler Error: ${err.message}`);
+            if (options.error) {
+                options.error(error);
+            }
+            throw error;
+        } finally {
+            if (fs.existsSync(tempFile)) {
+                fs.unlinkSync(tempFile);
+            }
         }
     }
+};
 
-    // --- 2. Header ---
-    ctx.font = 'bold 14px Arial';
-    ctx.textAlign = 'center';
-    ctx.fillText(p.data.storeName.toUpperCase(), WIDTH / 2, currentY);
-    currentY += 18;
+export function printReceipt(p: PrintData) {
+    return TE.tryCatch(
+        async () => {
+            const printer = new ThermalPrinter({
+                type: PrinterTypes.EPSON,
+                interface: 'printer:' + p.printer,
+                driver: WindowsBinaryDriver,
+                width: 42,
+            });
 
-    ctx.font = '9px Arial';
-    ctx.fillText(p.data.address, WIDTH / 2, currentY);
-    currentY += 25;
+            printer.alignCenter();
+            printer.setTextSize(1, 1);
+            printer.println(p.data.storeName.toUpperCase());
 
-    // --- 3. Metadata (Monospace for alignment) ---
-    ctx.textAlign = 'left';
-    ctx.font = '8px Courier New';
-    ctx.fillText(`Date: ${p.data.date}`, MARGIN, currentY);
-    ctx.fillText(`ID:   ${p.data.transactionId}`, MARGIN, currentY + 10);
-    
-    ctx.textAlign = 'right';
-    ctx.fillText(`Mode: ${p.data.paymentMode}`, WIDTH - MARGIN, currentY);
-    ctx.fillText(`By:   ${p.data.printedBy}`, WIDTH - MARGIN, currentY + 10);
-    currentY += 30;
+            printer.alignLeft();
+            printer.setTextNormal();
+            printer.println(p.data.address);
+            printer.println(`Date: ${p.data.date}`);
+            printer.println(`ID:   ${p.data.transactionId}`);
+            printer.println(`Mode: ${p.data.paymentMode} | By: ${p.data.printedBy}`);
+            printer.drawLine();
 
-    // Dashed Divider
-    ctx.beginPath();
-    ctx.setLineDash([2, 2]);
-    ctx.moveTo(MARGIN, currentY);
-    ctx.lineTo(WIDTH - MARGIN, currentY);
-    ctx.stroke();
-    ctx.setLineDash([]);
-    currentY += 10;
+            printer.leftRight("ITEM/DESCRIPTION", "PRICE");
+            printer.drawLine();
 
-    // --- 4. Items Table ---
-    ctx.font = 'bold 9px Courier New';
-    ctx.textAlign = 'left';
-    ctx.fillText("ITEM / DESCRIPTION", MARGIN, currentY);
-    ctx.textAlign = 'right';
-    ctx.fillText("TOTAL", WIDTH - MARGIN, currentY);
-    currentY += 15;
+            p.data.items.forEach(item => {
+                const lineTotal = item.unitPrice * item.qty;
+                printer.leftRight(
+                    `${item.name.substring(0, 24).toUpperCase()}`,
+                    formatCurrency(lineTotal, false)
+                );
+                printer.println(`  ${formatCurrency(item.unitPrice, false)} x ${item.qty}`);
+            });
 
-    ctx.font = '9px Courier New';
-    p.data.items.forEach(item => {
-        // Item Name
-        ctx.textAlign = 'left';
-        ctx.font = 'bold 9px Courier New';
-        ctx.fillText(item.name.substring(0, 24).toUpperCase(), MARGIN, currentY);
-        
-        // Price breakdown
-        currentY += 10;
-        ctx.font = '9px Courier New';
-        const lineTotal = item.unitPrice * item.qty;
-        ctx.textAlign = 'left';
-        ctx.fillText(`${item.unitPrice.toLocaleString()} x ${item.qty}`, MARGIN + 5, currentY);
-        
-        ctx.textAlign = 'right';
-        ctx.fillText(lineTotal.toLocaleString(), WIDTH - MARGIN, currentY);
-        currentY += 18; 
-    });
+            printer.drawLine();
 
-    // --- 5. Summary ---
-    ctx.beginPath();
-    ctx.moveTo(MARGIN, currentY);
-    ctx.lineTo(WIDTH - MARGIN, currentY);
-    ctx.stroke();
-    currentY += 10;
+            printer.leftRight("Subtotal:", formatCurrency(p.data.subtotal, false));
+            printer.leftRight("Discount:", `-${formatCurrency(p.data.discount, false)}`);
+            printer.bold(true);
+            printer.leftRight("TOTAL:", `${formatCurrency(p.data.total, false)}`);
+            printer.bold(false);
 
-    const summaryX = WIDTH * 0.45;
-    const drawLine = (label: string, val: string, isBold = false) => {
-        ctx.font = isBold ? 'bold 11px Courier New' : '9px Courier New';
-        ctx.textAlign = 'left';
-        ctx.fillText(label, summaryX, currentY);
-        ctx.textAlign = 'right';
-        ctx.fillText(val, WIDTH - MARGIN, currentY);
-        currentY += isBold ? 15 : 12;
-    };
+            printer.alignCenter();
+            printer.println(`Total Items: ${p.data.items.length}`);
+            printer.println("Thank you!");
 
-    drawLine("Subtotal:", p.data.subtotal.toLocaleString());
-    drawLine("Discount:", `-${p.data.discount.toLocaleString()}`);
-    currentY += 5;
-    drawLine("TOTAL:", `N${p.data.total.toLocaleString()}`, true);
+            printer.cut();
 
-    // --- 6. Footer ---
-    currentY += 20;
-    ctx.textAlign = 'center';
-    ctx.font = '8px Arial';
-    ctx.fillText(`Total Items: ${p.data.items.length}`, WIDTH / 2, currentY);
-    currentY += 15;
-    ctx.font = 'italic 9px Arial';
-    ctx.fillText("Thank you for your business!", WIDTH / 2, currentY);
-
-    // --- 7. Save and Print ---
-    const filePath = path.join(os.tmpdir(), `receipt-${Date.now()}.pdf`);
-    const out = fs.createWriteStream(filePath);
-    const stream = canvas.createPDFStream();
-    
-    await new Promise((resolve, reject) => {
-        stream.pipe(out);
-        out.on('finish', resolve);
-        out.on('error', reject);
-    });
-
-    await pdfToPrinter.print(filePath, {
-        scale: 'noscale',
-        paperSize: p.pageSize,
-        monochrome: true,
-        copies: 1
-    });
-
-    fs.unlink(filePath, () => {});
+            await printer.execute();
+        },
+        (err) => AppErrors.HandledError(err, "There was an error printing")
+    )
 }

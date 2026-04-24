@@ -35,3 +35,46 @@ export async function apiSearch(p: {
         }
     });
 }
+
+export const api = async ( p: { 
+    url: string, 
+    method: "GET" | "POST" | "PATCH" | "DELETE", 
+    withAuth?: boolean, 
+    body?: Record<string, any>, 
+    onSuccess: (data: any) => void, 
+    onFail?: (data: any) => void 
+}) => {
+
+
+    let options: {
+        method: string,
+        body? : string,
+        headers? : {}
+    } = {
+       method: p.method,
+       headers: {
+         'Content-Type': 'application/json'
+       }
+       
+    }
+
+    if( p.body ){
+        options.body = JSON.stringify(p.body)
+    }
+
+    if(p.withAuth){
+        const token = localStorage.getItem("authToken")
+        options.headers = { ...options.headers, 'Authorization': 'Bearer ' + token }
+    }
+    const req = await fetch(`${BASE_URL}${p.url}`, options);
+
+    const res = await req.json()
+
+    if( ! req.ok && p.onFail ){
+        return p.onFail( res )
+    }
+
+    return p.onSuccess(res)
+
+
+}

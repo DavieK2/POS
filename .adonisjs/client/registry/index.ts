@@ -18,6 +18,42 @@ const routes = {
     tokens: [{"old":"/auth/login","type":0,"val":"auth","end":""},{"old":"/auth/login","type":0,"val":"login","end":""}],
     types: placeholder as Registry['authentication.sign_in']['types'],
   },
+  'authentication.get_auth_user': {
+    methods: ["GET"],
+    pattern: '/auth/me',
+    tokens: [{"old":"/auth/me","type":0,"val":"auth","end":""},{"old":"/auth/me","type":0,"val":"me","end":""}],
+    types: placeholder as Registry['authentication.get_auth_user']['types'],
+  },
+  'authentication.sign_out': {
+    methods: ["POST"],
+    pattern: '/auth/logout',
+    tokens: [{"old":"/auth/logout","type":0,"val":"auth","end":""},{"old":"/auth/logout","type":0,"val":"logout","end":""}],
+    types: placeholder as Registry['authentication.sign_out']['types'],
+  },
+  'order.get_orders': {
+    methods: ["GET"],
+    pattern: '/orders',
+    tokens: [{"old":"/orders","type":0,"val":"orders","end":""}],
+    types: placeholder as Registry['order.get_orders']['types'],
+  },
+  'order.create_order': {
+    methods: ["POST"],
+    pattern: '/order/create',
+    tokens: [{"old":"/order/create","type":0,"val":"order","end":""},{"old":"/order/create","type":0,"val":"create","end":""}],
+    types: placeholder as Registry['order.create_order']['types'],
+  },
+  'order.update_order': {
+    methods: ["PATCH"],
+    pattern: '/order/update/:order',
+    tokens: [{"old":"/order/update/:order","type":0,"val":"order","end":""},{"old":"/order/update/:order","type":0,"val":"update","end":""},{"old":"/order/update/:order","type":1,"val":"order","end":""}],
+    types: placeholder as Registry['order.update_order']['types'],
+  },
+  'order.print_order': {
+    methods: ["POST"],
+    pattern: '/order/print',
+    tokens: [{"old":"/order/print","type":0,"val":"order","end":""},{"old":"/order/print","type":0,"val":"print","end":""}],
+    types: placeholder as Registry['order.print_order']['types'],
+  },
   'printer.get_printers': {
     methods: ["GET"],
     pattern: '/printers',

@@ -8,7 +8,7 @@ import { v7 } from 'uuid'
 
 
 const AuthFinder = withAuthFinder(() => hash.use('scrypt'), {
-  uids: ['email'],
+  uids: ['username'],
   passwordColumnName: 'password',
 })
 
@@ -24,6 +24,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
 
   @column()
   declare userName: string
+
+   @column()
+  declare role: string
 
   @column()
   declare isDeleted: boolean

@@ -4,6 +4,7 @@
  */
 
 export interface Categories {
+  categoryImage: string | null;
   categoryName: string;
   createdAt: string | null;
   id: string | null;

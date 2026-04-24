@@ -30,12 +30,14 @@ export interface OrderItem {
  
 export interface Order {
   id: string;
+  orderId?: string;
   status: OrderStatus;
   discount: number;
   note: string;
   paymentMethod? : string;
   items: ActiveOrderItem[];
   currentSelectedItem: ActiveOrderItem | null
+  createdAt?: string | null
 }
  
 export interface PastOrder {

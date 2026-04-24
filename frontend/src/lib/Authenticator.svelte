@@ -1,20 +1,20 @@
 <script lang="ts">
-  import { goto } from "@mateothegreat/svelte5-router";
-  import { onMount, type Snippet } from "svelte";
+    import { goto } from "@mateothegreat/svelte5-router";
+    import { onMount, type Snippet } from "svelte";
+    import { api } from "../utils";
 
 
     let { children } : { children: Snippet } = $props();
 
-    let isAuthenticated = sessionStorage.getItem("login");
+    onMount( async () => {
 
-    onMount(() => {
-
-        if( isAuthenticated === "false" ){
-            goto('/')
-        }
-
-        // setTimeout(() =>  sessionStorage.setItem("login", "false"), 5000 )
-
+        await api({
+            url: '/auth/me',
+            method: "GET",
+            withAuth: true,
+            onSuccess: () => {},
+            onFail: () =>  goto('/')
+        })
     })
 
 </script>

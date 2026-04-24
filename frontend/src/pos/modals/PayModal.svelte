@@ -1,5 +1,5 @@
 <script lang="ts">
-  import type { EnrichedItem, Order, PaymentMethod } from "../main/types";
+  import type { Order, PaymentMethod } from "../main/types";
   import { fmt, paymentOptions } from "../main/utils";
 
 
@@ -39,7 +39,7 @@
     <!-- Header -->
     <div class="bg-[#0A0A0A] p-5">
       <p class="text-[12px] font-bold tracking-[0.12em] uppercase text-white/40 mb-1">
-        Pay Order #{activeOrder?.id}
+        Pay Order #{activeOrder?.orderId}
       </p>
       <p id="pay-modal-title" class="font-['DM_Mono',monospace] text-[42px] font-medium text-white leading-none tracking-[-0.02em]">
         {fmt(total)}
@@ -64,7 +64,7 @@
             class="flex flex-col items-center gap-2 p-2 rounded-lg border-2 transition-all
                    {payMethod === m.id ? 'border-[#0A0A0A] bg-zinc-50' : 'border-zinc-200 hover:border-zinc-300'}"
           >
-            <span class="text-xs font-semibold tracking-[0.06em] uppercase {payMethod === m.id ? 'text-[#0A0A0A]' : 'text-zinc-400'}">
+            <span class="text-[12px] font-semibold tracking-[0.06em] uppercase {payMethod === m.id ? 'text-[#0A0A0A]' : 'text-zinc-400'}">
               {m.label}
             </span>
           </button>
@@ -72,13 +72,13 @@
       </div>
 
       <!-- Items summary -->
-      <div class="bg-zinc-50 rounded-xl p-3 mb-3 divide-y divide-zinc-200 max-h-36 overflow-y-auto custom-scrollbar">
+      <div class="main-font bg-zinc-50 rounded-xl p-3 mb-3 divide-y divide-zinc-200 max-h-36 overflow-y-auto custom-scrollbar">
         {#each activeOrder!.items as item}
           <div class="flex justify-between items-center py-1.5 first:pt-0 last:pb-0">
             <span class="text-sm font-medium text-zinc-600 truncate max-w-40">
               {item.productName} ×{item.qty}
             </span>
-            <span class="font-['DM_Mono',monospace] text-sm font-medium text-zinc-800">
+            <span class="text-sm font-medium text-zinc-800">
               {fmt(item.price * item.qty)}
             </span>
           </div>

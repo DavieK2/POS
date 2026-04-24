@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { startBarcodeScanner } from "../../barcode";
   import { apiSearch, BASE_URL, formatCurrency } from "../../utils";
   import type { ActiveOrderItem, POSProduct } from "../main/types";
   import { onMount, onDestroy } from "svelte";
@@ -26,50 +27,11 @@
 
   let hasSearchQuery = $derived(searchQuery.trim().length > 0);
 
-  const SCANNER_MAX_GAP_MS = 50; 
-  const SCANNER_MIN_LENGTH = 3; 
-
-  let scanBuffer = "";
-  let lastKeyTime = 0;
-  let bufferTimer: ReturnType<typeof setTimeout> | null = null;
-
-  function resetBuffer(): void {
-    scanBuffer = "";
-    lastKeyTime = 0;
-    if (bufferTimer) {
-      clearTimeout(bufferTimer);
-      bufferTimer = null;
-    }
-  }
-
-  function handleGlobalKeydown(e: KeyboardEvent): void {
-    if ((e.target as HTMLElement)?.tagName === "INPUT") return;
-    if (e.key.length > 1 && e.key !== "Enter") return;
-
-    const now = Date.now();
-
-    if (e.key === "Enter") {
-      const barcode = scanBuffer.trim();
-      if (barcode.length >= SCANNER_MIN_LENGTH) {
-        console.log("[BarcodeScanner] Scanned barcode:", barcode);
-        onBarcodeScanned(barcode);
-      }
-      resetBuffer();
-      return;
-    }
-
-    if (lastKeyTime && now - lastKeyTime > SCANNER_MAX_GAP_MS) {
-      resetBuffer();
-    }
-
-    scanBuffer += e.key;
-    lastKeyTime = now;
-
-    if (bufferTimer) clearTimeout(bufferTimer);
-    bufferTimer = setTimeout(resetBuffer, 500);
-  }
+  let stopScanner: (() => void) | null = null;
 
   function onBarcodeScanned(barcode: string): void {
+    console.log(barcode);
+    
     if (isHeld || !hasActiveOrder || isBarcodeSearching) return;
     triggerScanEffect();
     handleSearchBarcode(barcode);
@@ -130,12 +92,11 @@
 
   // ── Lifecycle ───────────────────────────────────────────────────────────────
   onMount(() => {
-    window.addEventListener("keydown", handleGlobalKeydown);
+    stopScanner = startBarcodeScanner(onBarcodeScanned);
   });
 
   onDestroy(() => {
-    window.removeEventListener("keydown", handleGlobalKeydown);
-    resetBuffer();
+    stopScanner?.();
   });
 </script>
 
@@ -168,20 +129,6 @@
           </div>
 
           <div class="btn-scan-sweep absolute inset-0 pointer-events-none rounded-[14px]"></div>
-          
-          {#if isBarcodeSearching}
-            <div class="absolute inset-0 flex items-center justify-center bg-black/60 z-30 rounded-[14px] backdrop-blur-[2px]">
-              <div class="flex flex-col items-center gap-2">
-                <div class="loader-ring">
-                  <div></div>
-                  <div></div>
-                  <div></div>
-                  <div></div>
-                </div>
-                <span class="text-[10px] font-medium text-green-400 tracking-wider uppercase animate-pulse">Searching</span>
-              </div>
-            </div>
-          {/if}
         </button>
 
         <div class="flex flex-col items-center gap-1 z-10 relative">
@@ -250,7 +197,7 @@
         <button
           onclick={() => addItemToOrder({ ...result, qty: 1 })}
           class="flex items-center gap-3 px-3 py-2.5 rounded-[11px] border border-transparent hover:bg-zinc-50 hover:border-zinc-200 transition-all text-left cursor-pointer w-full group active:scale-[0.99] overflow-hidden relative animate-fade-in-up"
-          style="animation-delay: {result.id * 0.03}s; animation-fill-mode: both;"
+          style="animation-delay: {(Math.random() ) * 0.03}s; animation-fill-mode: both;"
           aria-label="Add {result.productName} — {formatCurrency(result.price)}"
         >
           <div class="absolute left-0 top-[20%] bottom-[20%] w-0.75 rounded-r-full opacity-60" style="background:{meta.hex}"></div>
@@ -345,33 +292,6 @@
     animation: fade-in 0.3s ease-out forwards;
   }
 
-  /* ── Scanner loader ring ──────────────────────────────────────────────────── */
-  .loader-ring {
-    display: inline-block;
-    position: relative;
-    width: 28px;
-    height: 28px;
-  }
-  .loader-ring div {
-    box-sizing: border-box;
-    display: block;
-    position: absolute;
-    width: 24px;
-    height: 24px;
-    margin: 2px;
-    border: 2.5px solid #4ade80;
-    border-radius: 50%;
-    animation: loader-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
-    border-color: #4ade80 transparent transparent transparent;
-  }
-  .loader-ring div:nth-child(1) { animation-delay: -0.45s; }
-  .loader-ring div:nth-child(2) { animation-delay: -0.3s; }
-  .loader-ring div:nth-child(3) { animation-delay: -0.15s; }
-  @keyframes loader-ring {
-    0% { transform: rotate(0deg); }
-    100% { transform: rotate(360deg); }
-  }
-
   /* ── Input dots loader ────────────────────────────────────────────────────── */
   .loader-dots {
     display: inline-flex;
@@ -395,7 +315,7 @@
     40% { transform: scale(1); opacity: 1; }
   }
 
-  /* ── Existing scan animations ─────────────────────────────────────────────── */
+  /* ── Scan animations ──────────────────────────────────────────────────────── */
   .scan-line-hero {
     animation: sweepHero 0.9s ease-in-out infinite alternate;
   }

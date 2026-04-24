@@ -123,7 +123,7 @@
         <!-- Line subtotal -->
         <div class="text-right">
           <p class="text-[11px] font-bold tracking-widest uppercase text-zinc-400 mb-0.5">Subtotal</p>
-          <p class="font-['DM_Mono',monospace] text-[26px] font-semibold text-[#0A0A0A] leading-none">
+          <p class="text-[26px] font-semibold text-[#0A0A0A] leading-none">
             {fmt(currentSelectedItem.price * currentSelectedItem.qty)}
           </p>
         </div>

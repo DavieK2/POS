@@ -1,7 +1,7 @@
 <script lang="ts">
   import { showToast } from "../../../lib/toast";
   import Button from "../../../shared/button.svelte";
-  import { BASE_URL } from "../../../utils";
+  import { api, BASE_URL } from "../../../utils";
 
   let {
     closeAddCategoryModal,
@@ -55,23 +55,16 @@
     e.preventDefault();
 
 
-    const req = await fetch(`${BASE_URL}/category`, {
+    await api({
+        url: '/category',
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ categoryName, categoryImage }),
+        body: { categoryName, categoryImage },
+        onFail: (data) => showToast(data.message),
+        onSuccess: (data) =>  onCategoryAdded({ message: data.message })
     });
 
-    const res = await req.json();
-
-    if (!req.ok) {
-      console.log(res);
-      showToast(res.message)
-      return;
-    }
-
-    onCategoryAdded({ message: res.message })
-
     isLoading = false;
+    
   };
 </script>
 

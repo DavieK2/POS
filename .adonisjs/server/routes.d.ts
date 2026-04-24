@@ -6,6 +6,12 @@ export type ScannedRoutes = {
   ALL: {
     'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
     'authentication.sign_in': { paramsTuple?: []; params?: {} }
+    'authentication.get_auth_user': { paramsTuple?: []; params?: {} }
+    'authentication.sign_out': { paramsTuple?: []; params?: {} }
+    'order.get_orders': { paramsTuple?: []; params?: {} }
+    'order.create_order': { paramsTuple?: []; params?: {} }
+    'order.update_order': { paramsTuple: [ParamValue]; params: {'order': ParamValue} }
+    'order.print_order': { paramsTuple?: []; params?: {} }
     'printer.get_printers': { paramsTuple?: []; params?: {} }
     'printer.print_barcode': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
     'category.get_categories': { paramsTuple?: []; params?: {} }
@@ -22,6 +28,8 @@ export type ScannedRoutes = {
   }
   GET: {
     'drive.fs.serve': { paramsTuple: [...ParamValue[]]; params: {'*': ParamValue[]} }
+    'authentication.get_auth_user': { paramsTuple?: []; params?: {} }
+    'order.get_orders': { paramsTuple?: []; params?: {} }
     'printer.get_printers': { paramsTuple?: []; params?: {} }
     'category.get_categories': { paramsTuple?: []; params?: {} }
     'products.get_products': { paramsTuple?: []; params?: {} }
@@ -33,12 +41,16 @@ export type ScannedRoutes = {
   }
   POST: {
     'authentication.sign_in': { paramsTuple?: []; params?: {} }
+    'authentication.sign_out': { paramsTuple?: []; params?: {} }
+    'order.create_order': { paramsTuple?: []; params?: {} }
+    'order.print_order': { paramsTuple?: []; params?: {} }
     'printer.print_barcode': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
     'category.add_category': { paramsTuple?: []; params?: {} }
     'products.add_product': { paramsTuple?: []; params?: {} }
     'products.generate_product_barcode': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
   }
   PATCH: {
+    'order.update_order': { paramsTuple: [ParamValue]; params: {'order': ParamValue} }
     'category.update_category': { paramsTuple: [ParamValue]; params: {'categoryId': ParamValue} }
     'products.update_product': { paramsTuple: [ParamValue]; params: {'product': ParamValue} }
   }

@@ -6,6 +6,7 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().unique()
+      table.string('order_id').unique()
       table.string('status').nullable().defaultTo("active")
       table.json("items").nullable()
       table.decimal("discount").nullable()
@@ -19,6 +20,6 @@ export default class extends BaseSchema {
   }
 
   async down() {
-    this.schema.dropTable(this.tableName)
+      this.schema.dropTable(this.tableName)
   }
 }

@@ -1,10 +1,35 @@
 <script lang="ts">
   import { goto } from "@mateothegreat/svelte5-router";
+  import logo from '../assets/logo.jpg';
+  import { BASE_URL } from "../utils";
+  import { onMount } from "svelte";
 
   let showPassword = $state(false);
   let isLoading = $state(false);
   let username = $state("");
   let password = $state("");
+
+  onMount( async() => {
+
+      const token = localStorage.getItem("authToken");
+
+      if(token){
+
+          await fetch(`${BASE_URL}/auth/logout`, {
+              method: "POST",
+              headers:{
+                'Content-Type': 'application/json',
+                'Authorization': 'Bearer '+ token
+              }
+          })
+
+          localStorage.removeItem("authToken")
+          localStorage.removeItem("user");
+          localStorage.removeItem("loggedIn");
+
+      }
+
+  })
 
   async function handleSubmit(e: Event) {
     e.preventDefault();
@@ -12,37 +37,53 @@
     
     isLoading = true;
 
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    sessionStorage.setItem("login", "true");
-    
-    isLoading = false;
+    const req = await fetch(`${BASE_URL}/auth/login`, {
+        method: "POST",
+        body: JSON.stringify({
+            username,
+            password
+        }),
+        headers:{
+          'Content-Type': 'application/json'
+        }
+    })
 
-    if( username === "admin" ){
+    const res = await req.json()
+
+    if( ! req.ok ){ 
+
+      isLoading = false
+      return;
+    }
+
+    if( ! res.token ) return;
+    
+    localStorage.setItem("loggedIn", "true");
+    localStorage.setItem("authToken", res.token);
+    localStorage.setItem("user", JSON.stringify(res.user));
+    
+    
+    if( res.user.role === "admin" ){
       goto('/dashboard');
-
     }else{
        goto('/pos');
     }
+
+    isLoading = false;
+
   }
 </script>
 
-<div class="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100 p-4">
+<div class="min-h-screen flex items-center justify-center bg-linear-to-br from-gray-50 to-gray-100 p-4">
   <div class="bg-white text-gray-900 flex flex-col gap-6 rounded-2xl border border-gray-200 w-full max-w-md shadow-2xl shadow-gray-300/50">
     
     <!-- Header -->
-    <div class="px-8 pt-8 pb-2 text-center space-y-4">
-      <div class="mx-auto w-16 h-16 bg-black rounded-2xl flex items-center justify-center shadow-lg shadow-black/20">
-        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="w-8 h-8">
-          <path d="m2 7 4.41-4.41A2 2 0 0 1 7.83 2h8.34a2 2 0 0 1 1.42.59L22 7"></path>
-          <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
-          <path d="M15 22v-4a2 2 0 0 0-2-2h-2a2 2 0 0 0-2 2v4"></path>
-          <path d="M2 7h20"></path>
-          <path d="M22 7v3a2 2 0 0 1-2 2a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 16 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 12 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 8 12a2.7 2.7 0 0 1-1.59-.63.7.7 0 0 0-.82 0A2.7 2.7 0 0 1 4 12a2 2 0 0 1-2-2V7"></path>
-        </svg>
-      </div>
+    <div class="flex flex-col justify-center items-center px-8 pt-8 pb-2 text-center space-y-4">
+     <div class="">
+       <img class="h-20 w-20" src={logo} alt="">
+     </div>
       <div class="space-y-1">
-        <h1 class="text-2xl font-bold tracking-tight">Retail POS System</h1>
+        <h1 class="text-xl font-bold tracking-tight">Vine POS</h1>
         <p class="text-gray-500 text-sm">Sign in to access your dashboard</p>
       </div>
     </div>

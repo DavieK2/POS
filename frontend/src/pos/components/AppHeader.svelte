@@ -1,10 +1,41 @@
 <script lang="ts">
+  import { goto } from "@mateothegreat/svelte5-router";
+  import { api } from "../../utils";
+
   interface Props {
     dateString: string;
     timeString: string;
     onOpenSettings: () => void;
+    showToast: (message: string) => void;
   }
-  let { dateString, timeString, onOpenSettings }: Props = $props();
+  let { dateString, timeString, onOpenSettings, showToast }: Props = $props();
+  let user = JSON.parse(localStorage.getItem("user") || "")
+  let userName = $state(user.fullName)
+  let isLoggingOut = $state(false)
+
+  const logout = async() => {
+
+      isLoggingOut = true;
+
+      await api({
+        url: "/auth/logout",
+        method: "POST",
+        withAuth: true,
+        onSuccess: (_) => {
+          localStorage.removeItem("authToken")
+          localStorage.removeItem("user");
+          localStorage.removeItem("loggedIn");
+          goto('/')
+          isLoggingOut = false;
+        },
+        onFail: (res) => {
+          showToast(res.message)
+          isLoggingOut = false;
+        }
+      })
+
+      
+  }
 </script>
 
 <header class="shrink-0 h-12 bg-white border-b border-zinc-200 flex items-center justify-between px-5 z-10">
@@ -18,10 +49,10 @@
     <div class="w-px h-5.5 bg-zinc-200"></div>
 
     <div class="flex items-center gap-2 p-[4px_10px_4px_4px] border border-zinc-200 rounded-full bg-neutral-50">
-      <div class="w-6.5 h-6.5 rounded-full bg-[#0A0A0A] flex items-center justify-center text-white text-[12px] font-bold tracking-[0.05em]">
-        AJ
+      <div class="w-6.5 h-6.5 rounded-full uppercase bg-[#0A0A0A] flex items-center justify-center text-white text-[12px] font-bold tracking-[0.05em]">
+        {`${userName.charAt(0)}${userName.charAt(1)}`}
       </div>
-      <span class="text-xs font-semibold text-zinc-700">Alex J.</span>
+      <span class="text-xs font-semibold text-zinc-700">{userName}</span>
     </div>
 
     <button
@@ -37,13 +68,28 @@
 
     <button
       aria-label="Sign out"
-      class="w-8 h-8 border border-zinc-200 flex items-center justify-center text-red-600 rounded-lg hover:bg-red-50 transition-colors"
+      class="w-8 h-8 border border-zinc-200 flex items-center justify-center rounded-lg transition-colors {isLoggingOut ? 'text-red-400 cursor-not-allowed bg-red-50/50' : 'text-red-600 hover:bg-red-50'}"
+      disabled={isLoggingOut}
+      onclick={async() => await logout()}
     >
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-        <polyline points="16 17 21 12 16 7" />
-        <line x1="21" y1="12" x2="9" y2="12" />
-      </svg>
+      {#if isLoggingOut}
+        <svg class="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M12 2v4" stroke-linecap="round"/>
+          <path d="M12 18v4" stroke-linecap="round" opacity="0.3"/>
+          <path d="M4.93 4.93l2.83 2.83" stroke-linecap="round"/>
+          <path d="M16.24 16.24l2.83 2.83" stroke-linecap="round" opacity="0.3"/>
+          <path d="M2 12h4" stroke-linecap="round" opacity="0.3"/>
+          <path d="M18 12h4" stroke-linecap="round" opacity="0.3"/>
+          <path d="M4.93 19.07l2.83-2.83" stroke-linecap="round" opacity="0.3"/>
+          <path d="M16.24 7.76l2.83-2.83" stroke-linecap="round" opacity="0.3"/>
+        </svg>
+      {:else}
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+          <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+          <polyline points="16 17 21 12 16 7" />
+          <line x1="21" y1="12" x2="9" y2="12" />
+        </svg>
+      {/if}
     </button>
   </div>
 </header>

@@ -85,9 +85,9 @@
   <!-- Cancel Order -->
   <button
     onclick={(e) => { e.stopPropagation(); onOpenCancel(); }}
-    class="cursor-pointer bg-white border border-zinc-200 rounded-[11px] p-[9px_8px] flex items-center justify-center gap-1.5
-           text-sm font-medium text-zinc-700 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors
-           {! activeOrder || isHeld ? 'opacity-60 pointer-events-none' : ''}"
+    class="cursor-pointer rounded-[11px] p-[9px_8px] flex items-center justify-center gap-1.5
+           text-sm font-medium transition-colors
+           {! activeOrder || isHeld ? 'opacity-60 pointer-events-none bg-white border border-zinc-200 text-zinc-700' : 'bg-red-50 border border-red-200 text-red-700 hover:bg-red-50 hover:text-red-500 hover:border-red-200'}"
   >
     <svg class="size-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M9 9L15 15M15 9L9 15M7.8 21H16.2C17.88 21 18.72 21 19.36 20.67A3 3 0 0 0 20.67 19.36C21 18.72 21 17.88 21 16.2V7.8C21 6.12 21 5.28 20.67 4.64A3 3 0 0 0 19.36 3.33C18.72 3 17.88 3 16.2 3H7.8C6.12 3 5.28 3 4.64 3.33A3 3 0 0 0 3.33 4.64C3 5.28 3 6.12 3 7.8V16.2C3 17.88 3 18.72 3.33 19.36A3 3 0 0 0 4.64 20.67C5.28 21 6.12 21 7.8 21Z" />

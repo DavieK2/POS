@@ -36,13 +36,13 @@ export default class ValidationService {
 
                     const result = typedCustomRuleFn(data[typedKey], fail);
 
-                    if (result === FAILURE_TOKEN) {
+                    if ( result === FAILURE_TOKEN ) {
                         return false;
                     }
                 }
 
                 return true
-            });
+            }).pipe((data: T) => Object.fromEntries(Object.entries(data).filter(([_, v]) => v !== undefined)) as typeof data);;
 
 
         type validator = typeof validator.infer;

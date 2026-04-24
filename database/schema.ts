@@ -7,9 +7,36 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class AuthAccessTokenSchema extends BaseModel {
+  static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt'] as const
+  $columns = AuthAccessTokenSchema.$columns
+  @column()
+  declare abilities: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime | null
+  @column.dateTime()
+  declare expiresAt: DateTime | null
+  @column()
+  declare hash: string
+  @column({ isPrimary: true })
+  declare id: number
+  @column.dateTime()
+  declare lastUsedAt: DateTime | null
+  @column()
+  declare name: string | null
+  @column()
+  declare tokenableId: string | null
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class CategorySchema extends BaseModel {
-  static $columns = ['categoryName', 'createdAt', 'id', 'updatedAt'] as const
+  static $columns = ['categoryImage', 'categoryName', 'createdAt', 'id', 'updatedAt'] as const
   $columns = CategorySchema.$columns
+  @column()
+  declare categoryImage: string | null
   @column()
   declare categoryName: string
   @column.dateTime({ autoCreate: true })
@@ -21,7 +48,7 @@ export class CategorySchema extends BaseModel {
 }
 
 export class OrderSchema extends BaseModel {
-  static $columns = ['createdAt', 'discount', 'id', 'items', 'note', 'paymentMethod', 'status', 'updatedAt', 'userId'] as const
+  static $columns = ['createdAt', 'discount', 'id', 'items', 'note', 'orderId', 'paymentMethod', 'status', 'updatedAt', 'userId'] as const
   $columns = OrderSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -33,6 +60,8 @@ export class OrderSchema extends BaseModel {
   declare items: any | null
   @column()
   declare note: string | null
+  @column()
+  declare orderId: string | null
   @column()
   declare paymentMethod: string | null
   @column()
@@ -70,4 +99,34 @@ export class ProductSchema extends BaseModel {
   declare quantity: number | null
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+}
+
+export class RoleAbilitySchema extends BaseModel {
+  static $columns = ['abilityId', 'roleId'] as const
+  $columns = RoleAbilitySchema.$columns
+  @column()
+  declare abilityId: string | null
+  @column()
+  declare roleId: string | null
+}
+
+export class UserSchema extends BaseModel {
+  static $columns = ['createdAt', 'deletedAt', 'fullName', 'id', 'password', 'role', 'updatedAt', 'username'] as const
+  $columns = UserSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare deletedAt: DateTime | null
+  @column()
+  declare fullName: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column({ serializeAs: null })
+  declare password: string
+  @column()
+  declare role: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column()
+  declare username: string
 }

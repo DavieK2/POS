@@ -15,6 +15,7 @@ export interface Orders {
   id: string | null;
   items: string | null;
   note: string | null;
+  orderId: string | null;
   paymentMethod: string | null;
   status: Generated<string | null>;
   updatedAt: string;

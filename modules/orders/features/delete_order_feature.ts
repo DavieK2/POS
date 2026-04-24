@@ -4,16 +4,19 @@ import * as TE from 'fp-ts/lib/TaskEither.js';
 import BaseFeature from "../../../app/contracts/base_feature.js";
 import { Auth } from "#services/pipeline_builder";
 import { type } from "arktype";
+import ValidationService from "#services/validation_services";
 
-const rules = type();
+const rules = type({
+    order: "string & string > 0"
+});
 
 type ParamsType = typeof rules.infer
 
 export default class DeleteOrderFeature extends BaseFeature<TError, any> {
 
-    async handle(params: ParamsType ): Promise<E.Either<TError, any>> {
+    async handle(params: ParamsType & Auth ): Promise<E.Either<TError, any>> {
          return await DeleteOrderFeature.use<typeof params, typeof params>(params)
-                                        .chain()
+                                        .chain( (_, data) => ValidationService.validate({ rules, data }) )
                                         .catchErrors()
                                         .handle<TError>({
                                             'Default': (err: TError) => TE.left(err),
@@ -21,4 +24,5 @@ export default class DeleteOrderFeature extends BaseFeature<TError, any> {
                                         .run();
     }
 
+    
 }

@@ -3,7 +3,7 @@
   import Layout from "../../layouts/Layout.svelte";
   import CatogeryModal from "../components/CatogeryModal.svelte";
   import EditCategoryModal from "../components/EditCategoryModal.svelte";
-  import { BASE_URL, formatCurrency } from "../../../utils";
+  import { api, BASE_URL, formatCurrency } from "../../../utils";
   import DeleteCategoryModal from "../components/DeleteCategoryModal.svelte";
   import AddCategoryModal from "../components/AddCategoryModal.svelte";
   import AddProductModal from "../components/AddProductModal.svelte";
@@ -52,16 +52,27 @@
   });
 
   const getProducts = async() => {
-      const req = await fetch(`${BASE_URL}/products`);
-      const res = await req.json();
-      products = res;
+      await api({ 
+          url: '/products',
+          method: "GET",
+          withAuth: true,
+          onSuccess: (data) => products = data
+      });
+      
   }
 
   const getCategories = async() => {
-      const req = await fetch(`${BASE_URL}/categories`);
-      const res = await req.json();
-      categories = res;
-      categoryOptions = res.flatMap( (category: Category) => [{ text: category.categoryName, value: category.id }] );      
+
+    await api({ 
+          url: '/categories',
+          method: "GET",
+          withAuth: true,
+          onSuccess: (res) => {
+            categories = res;
+            categoryOptions = res.flatMap( (category: Category) => [{ text: category.categoryName, value: category.id }] ); 
+          }
+      });
+           
   }
 
 

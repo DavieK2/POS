@@ -5,7 +5,7 @@ import BaseFeature from "../../../app/contracts/base_feature.js";
 import { Auth } from "#services/pipeline_builder";
 import { type } from "arktype";
 import ValidationService from "#services/validation_services";
-import { commitDBTrasaction, startDBTrasaction } from "../../../app/tasks/base_tasks.ts";
+import { commitDBTrasaction, generateRandomAlphanumericNumber, startDBTrasaction } from "../../../app/tasks/base_tasks.ts";
 import ResponseMessage from "#services/response_message";
 import { v7 } from "uuid";
 import { ControlledTransaction } from "kysely";
@@ -56,13 +56,13 @@ export default class AddProductFeature extends BaseFeature<TError, any> {
 
     addNewProduct = ( opts: ParamsType & { dbTransaction: ControlledTransaction<DB, []>  }) => {
     
-        const productCode : string = btoa( Math.random().toString() ).substring(15, 25).toUpperCase();
+        
 
         return TE.tryCatch(
             () => opts.dbTransaction.insertInto("products").values({
                 id: v7(),
                 productName: opts.productName,
-                productCode: productCode,
+                productCode: generateRandomAlphanumericNumber(7),
                 price: opts.price,
                 quantity: opts.quantity,
                 description: opts.description,

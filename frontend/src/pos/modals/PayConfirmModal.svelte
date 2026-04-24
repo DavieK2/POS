@@ -11,6 +11,26 @@
     onClose: () => void;
   }
   let { activeOrder, total, payMethod, onConfirmAndPrint, onConfirm, onClose }: Props = $props();
+
+  let loadingAction = $state<'print' | 'confirm' | null>(null);
+
+  const handleConfirmAndPrint = async () => {
+    loadingAction = 'print';
+    try {
+      await Promise.resolve(onConfirmAndPrint());
+    } finally {
+      loadingAction = null;
+    }
+  };
+
+  const handleConfirm = async () => {
+    loadingAction = 'confirm';
+    try {
+      await Promise.resolve(onConfirm());
+    } finally {
+      loadingAction = null;
+    }
+  };
 </script>
 
 <div
@@ -35,7 +55,7 @@
       </div>
       <p id="pay-confirm-title" class="text-[20px] font-bold text-[#0A0A0A] mb-1">Confirm Payment?</p>
       <p class="text-[14px] text-zinc-500">
-        Order <span class="font-semibold text-zinc-700">#{activeOrder?.id}</span>
+        Order <span class="font-semibold text-zinc-700">#{activeOrder?.orderId}</span>
         &bull;
         <span class="font-['DM_Mono',monospace] font-semibold text-zinc-700">{fmt(total)}</span>
         via
@@ -45,26 +65,62 @@
 
     <div class="px-5 pb-5 flex flex-col gap-2">
       <button
-        onclick={onConfirmAndPrint}
+        onclick={handleConfirmAndPrint}
+        disabled={loadingAction !== null}
         class="w-full py-3 rounded-xl bg-zinc-800 text-white text-[15px] font-medium hover:bg-zinc-700
-               active:scale-95 transition-all flex items-center justify-center gap-2"
+               active:scale-95 transition-all flex items-center justify-center gap-2
+               disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
       >
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z" />
-        </svg>
-        Confirm &amp; Print Receipt
+        {#if loadingAction === 'print'}
+          <svg class="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2v4" stroke-linecap="round"/>
+            <path d="M12 18v4" stroke-linecap="round" opacity="0.3"/>
+            <path d="M4.93 4.93l2.83 2.83" stroke-linecap="round"/>
+            <path d="M16.24 16.24l2.83 2.83" stroke-linecap="round" opacity="0.3"/>
+            <path d="M2 12h4" stroke-linecap="round" opacity="0.3"/>
+            <path d="M18 12h4" stroke-linecap="round" opacity="0.3"/>
+            <path d="M4.93 19.07l2.83-2.83" stroke-linecap="round" opacity="0.3"/>
+            <path d="M16.24 7.76l2.83-2.83" stroke-linecap="round" opacity="0.3"/>
+          </svg>
+          Processing...
+        {:else}
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 9V2h12v7M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2M6 14h12v8H6z" />
+          </svg>
+          Confirm &amp; Print Receipt
+        {/if}
       </button>
 
       <button
-        onclick={onConfirm}
-        class="w-full py-3 rounded-xl bg-gray-500 text-white text-[15px] font-medium hover:opacity-80 active:scale-95 transition-all"
+        onclick={handleConfirm}
+        disabled={loadingAction !== null}
+        class="w-full py-3 rounded-xl bg-gray-500 text-white text-[15px] font-medium hover:opacity-80 
+               active:scale-95 transition-all flex items-center justify-center gap-2
+               disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100"
       >
-        Confirm
+        {#if loadingAction === 'confirm'}
+          <svg class="animate-spin" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2v4" stroke-linecap="round"/>
+            <path d="M12 18v4" stroke-linecap="round" opacity="0.3"/>
+            <path d="M4.93 4.93l2.83 2.83" stroke-linecap="round"/>
+            <path d="M16.24 16.24l2.83 2.83" stroke-linecap="round" opacity="0.3"/>
+            <path d="M2 12h4" stroke-linecap="round" opacity="0.3"/>
+            <path d="M18 12h4" stroke-linecap="round" opacity="0.3"/>
+            <path d="M4.93 19.07l2.83-2.83" stroke-linecap="round" opacity="0.3"/>
+            <path d="M16.24 7.76l2.83-2.83" stroke-linecap="round" opacity="0.3"/>
+          </svg>
+          Processing...
+        {:else}
+          Confirm
+        {/if}
       </button>
 
       <button
         onclick={onClose}
-        class="w-full py-3 rounded-xl border border-zinc-200 text-[15px] font-medium text-zinc-500 hover:bg-zinc-50 hover:text-zinc-700 transition-colors"
+        disabled={loadingAction !== null}
+        class="w-full py-3 rounded-xl border border-zinc-200 text-[15px] font-medium text-zinc-500 
+               hover:bg-zinc-50 hover:text-zinc-700 transition-colors
+               disabled:opacity-60 disabled:cursor-not-allowed"
       >
         Close
       </button>

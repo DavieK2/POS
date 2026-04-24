@@ -9,6 +9,14 @@ export interface ApiDefinition {
   }
   authentication: {
     signIn: typeof routes['authentication.sign_in']
+    getAuthUser: typeof routes['authentication.get_auth_user']
+    signOut: typeof routes['authentication.sign_out']
+  }
+  order: {
+    getOrders: typeof routes['order.get_orders']
+    createOrder: typeof routes['order.create_order']
+    updateOrder: typeof routes['order.update_order']
+    printOrder: typeof routes['order.print_order']
   }
   printer: {
     getPrinters: typeof routes['printer.get_printers']
