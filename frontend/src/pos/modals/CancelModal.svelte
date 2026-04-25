@@ -7,6 +7,18 @@
     onClose: () => void;
   }
   let { activeOrder, onConfirm, onClose }: Props = $props();
+
+  let isCancelling = $state(false);
+
+  const handleConfirm = async () => {
+    if (!activeOrder) return;
+    isCancelling = true;
+    try {
+      await Promise.resolve(onConfirm(activeOrder));
+    } finally {
+      isCancelling = false;
+    }
+  };
 </script>
 
 <div
@@ -36,15 +48,33 @@
     <div class="flex gap-2">
       <button
         onclick={onClose}
-        class="flex-1 py-2.5 rounded-xl border border-zinc-200 text-sm font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors"
+        disabled={isCancelling}
+        class="flex-1 py-2.5 rounded-xl border border-zinc-200 text-sm font-semibold text-zinc-600 hover:bg-zinc-50 transition-colors
+               disabled:opacity-60 disabled:cursor-not-allowed"
       >
         Keep Order
       </button>
       <button
-        onclick={ () => onConfirm(activeOrder!)}
-        class="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 active:scale-95 transition-all"
+        onclick={handleConfirm}
+        disabled={isCancelling}
+        class="flex-1 py-2.5 rounded-xl bg-red-600 text-white text-sm font-semibold hover:bg-red-700 active:scale-95 transition-all
+               disabled:opacity-60 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center gap-2"
       >
-        Cancel Order
+        {#if isCancelling}
+          <svg class="animate-spin" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+            <path d="M12 2v4" stroke-linecap="round"/>
+            <path d="M12 18v4" stroke-linecap="round" opacity="0.3"/>
+            <path d="M4.93 4.93l2.83 2.83" stroke-linecap="round"/>
+            <path d="M16.24 16.24l2.83 2.83" stroke-linecap="round" opacity="0.3"/>
+            <path d="M2 12h4" stroke-linecap="round" opacity="0.3"/>
+            <path d="M18 12h4" stroke-linecap="round" opacity="0.3"/>
+            <path d="M4.93 19.07l2.83-2.83" stroke-linecap="round" opacity="0.3"/>
+            <path d="M16.24 7.76l2.83-2.83" stroke-linecap="round" opacity="0.3"/>
+          </svg>
+          Cancelling...
+        {:else}
+          Cancel Order
+        {/if}
       </button>
     </div>
   </div>

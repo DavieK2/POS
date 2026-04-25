@@ -1,6 +1,7 @@
 <script lang="ts">
   import { goto } from "@mateothegreat/svelte5-router";
   import { api } from "../../utils";
+  import logo from '../../assets/logo.jpg';
 
   interface Props {
     dateString: string;
@@ -39,7 +40,10 @@
 </script>
 
 <header class="shrink-0 h-12 bg-white border-b border-zinc-200 flex items-center justify-between px-5 z-10">
-  <span class="font-['Syne',sans-serif] font-extrabold text-[20px] tracking-[0.2em] uppercase">Vine</span>
+  <div class="flex items-center gap-2">
+    <img class="h-8 w-8" src={logo} alt="">
+    <span class="font-bold text-[20px] text-zinc-700">Vine POS</span>
+  </div>
 
   <div class="flex items-center gap-3">
     <span class="text-xs text-zinc-500 min-w-42.5 text-right">

@@ -250,7 +250,7 @@
             {@const isExpanded = expandedIds.includes(po.id)}
             <div class="bg-white border-b border-zinc-100 last:border-0">
               <button class="w-full grid grid-cols-[100px_2.5fr_1fr_80px_24px] gap-4 p-4 text-left hover:bg-zinc-50/50 transition-colors items-center" onclick={() => toggleExpand(po.id)} aria-expanded={isExpanded} aria-label="Order #{po.orderId} — {formatDate(po.createdAt!)} — {po.status} — {fmt(orderTotal(po))}">
-                <span class="text-sm font-medium text-zinc-900">#{po.orderId}</span>
+                <span class="text-xs font-medium text-zinc-900">#{po.orderId}</span>
                 <span class="text-xs text-zinc-700">{formatDate(po.createdAt!)}</span>
                 <span class="text-xs font-medium {po.status === 'paid' ? 'text-green-800' : 'text-red-700'} flex items-center gap-1.5">
                   <span class="w-1.5 h-1.5 rounded-full {po.status === 'paid' ? 'bg-green-500' : 'bg-red-500'}"></span>
@@ -275,7 +275,7 @@
                 {@const total = orderTotal(po)}
                 <div class="px-4 pb-4 pt-1">
                   {#if po.items.length === 0}
-                    <p class="text-sm text-zinc-400 italic">No items recorded.</p>
+                    <p class="text-xs text-zinc-400 italic p-3">No items recorded.</p>
                   {:else}
                     <div class="flex flex-col gap-2 mb-4 bg-zinc-50/50 p-3 rounded-lg">
                       {#each po.items as item}
@@ -292,6 +292,12 @@
                     </div>
                   {/if}
 
+                 {#if po.note}
+                  <div class="w-full bg-zinc-50 p-3 txt-zinc-600 rounded my-2">
+                    <p class="text-xs font-bold text-zinc-600">Note:</p>
+                    <p class="text-xs text-zinc-600">{po.note}</p>
+                  </div>
+                 {/if}
                   <div class="flex flex-col gap-1.5 mb-4 px-3">
                     <div class="flex justify-between items-center text-xs">
                       <span class="text-zinc-500">Subtotal</span>

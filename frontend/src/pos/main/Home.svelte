@@ -340,8 +340,26 @@
       showNoteModal = true;
     }
   }
-  function saveNote(): void {
-    if (activeOrder) activeOrder.note = draftNote;
+  async function saveNote(): Promise<void> {
+    if (! activeOrder) return;
+    
+    const note = activeOrder.note
+    activeOrder.note = draftNote;
+
+     await api({
+        url: `/order/update/${activeOrder.id}`,
+        method: "PATCH",
+        withAuth: true,
+        body: {
+          note: activeOrder.note,
+        },
+        onSuccess: (_) => showToast("Note added."),
+        onFail: (res) => {
+          activeOrder!.note = note;
+          showToast(res.message);
+        },
+    });
+
     showNoteModal = false;
   }
 
@@ -464,7 +482,7 @@
         showToast("Order has been confirmed");
 
         if (withPrinting)  await printReceipt(activeOrder!)
-        
+
         showPayConfirm = false;
         activeOrder = null;
         await getTabOrders();

@@ -30,9 +30,6 @@
       const getPrinterFromCache = localStorage.getItem("receiptPrinter")
       const getSelectedPaperSizeFromCache = localStorage.getItem("receiptPageSize")
 
-      console.log(getSelectedPaperSizeFromCache);
-      
-
       if (!req.ok) {
         showToast("Could not fetch printers");
       }
@@ -81,10 +78,10 @@
         <div class="relative">
           <Dropdown options={printers} selected={selectedPrinter} onSelect={(o) => (selectedPrinter = o)} />
            <!-- Paper size dropdown -->
-            <div class="space-y-2">
-              <label for="papersize" class="block text-sm font-semibold text-neutral-700 mt-2">Paper Size</label>
-              <Dropdown selected={selectedPaperSize} options={paperSizeOptions} onSelect={(option) => localStorage.setItem('receiptPageSize', option.value)} />
-            </div>
+          <div class="space-y-2">
+            <label for="papersize" class="block text-sm font-semibold text-neutral-700 mt-2">Paper Size</label>
+            <Dropdown selected={selectedPaperSize} options={paperSizeOptions} onSelect={(option) => localStorage.setItem('receiptPageSize', option.value)} />
+          </div>
         </div>
       {/if}
     </div>

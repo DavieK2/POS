@@ -51,7 +51,7 @@
     aria-haspopup="listbox"
     aria-expanded={openDropdown}
   >
-    <span class="text-base text-black truncate">{selectedText}</span>
+    <span class="text-sm text-gray-600 truncate">{selectedText}</span>
     <svg
       xmlns="http://www.w3.org/2000/svg"
       width="16"
@@ -75,9 +75,9 @@
         <button
           type="button"
           onclick={() => onSelected(option)}
-          class="w-full px-4 py-2.5 text-left text-sm hover:bg-neutral-50 transition-colors flex items-center justify-between {selected.value ===
+          class="w-full px-4 py-2.5 text-left hover:bg-neutral-50 text-xs transition-colors flex items-center justify-between {selected.value ===
           option.value
-            ? 'text-black font-medium'
+            ? 'text-zinc-600 font-medium'
             : 'text-neutral-700'}"
           role="option"
           aria-selected={selected.value === option.value}
