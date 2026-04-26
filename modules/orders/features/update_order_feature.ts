@@ -52,7 +52,7 @@ export default class UpdateOrderFeature extends BaseFeature<TError, any> {
                                             onTrue: ( items, { __user, auth, ...data }) =>  this.updateOrder({ ...data, items: JSON.stringify(items) }),
                                             onFalse: (_, { __user, auth, items, ...data }) =>  this.updateOrder(data)
                                         })
-                                        .chain((_, __) => ResponseMessage.successMessage("Order updated") )
+                                        .chain((_, __) => ResponseMessage.successMessage("Order Updated") )
                                         .catchErrors()
                                         .handle<TError>({
                                             'Default': (err: TError) => TE.left(err),

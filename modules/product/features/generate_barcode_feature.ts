@@ -13,27 +13,33 @@ import { dbq } from "#config/db";
 import ResponseMessage from "#services/response_message";
 
 const rules = type({
-    product: 'string & string > 0'
+    product: 'string & string > 0',
+    barcode: type('string').optional()
 });
 
 type ParamsType = typeof rules.infer
 
 export default class GenerateBarcodeFeature extends BaseFeature<TError, any> {
 
-    async handle(params: ParamsType  & Auth ): Promise<E.Either<TError, any>> {
+    async handle(params: ParamsType & Auth): Promise<E.Either<TError, any>> {
          return await GenerateBarcodeFeature.use<typeof params, typeof params>(params)
-                                            // .withAuth()
-                                            .chain( (_, data) => ValidationService.validate({ rules, data }) )
-                                            .chain( (_, data) => validateProduct( data.product ) )
-                                            .chainAndStore('barcode', (_, __) => this.generateBarcode() )
-                                            .chainAndStore("barcodeImage", (barcode, __ ) => this.generateBarcodeImage(barcode) )
-                                            .chainAndStore("uploadPath", (image, _) => this.uploadBarcodeImage( image ) )
-                                            .chain( (_, data) => this.updateBarcodeImagePathToProduct({
+                                            .withAuth()
+                                            .chain((_, data) => ValidationService.validate({ rules, data }))
+                                            .chain((_, data) => validateProduct(data.product))
+                                            .chainIfElseAndStore({
+                                                storeKey: "barcode",
+                                                condition: (_, data) => !data.barcode,
+                                                onTrue: (_, __) => this.generateBarcode(),
+                                                onFalse: (_, data) => TE.right(data.barcode)
+                                            })
+                                            .chainAndStore("barcodeImage", (_, data) => this.generateBarcodeImage(data.__barcode!))
+                                            .chainAndStore("uploadPath", (image, _) => this.uploadBarcodeImage(image))
+                                            .chain((_, data) => this.updateBarcodeImagePathToProduct({
                                                 productId: data.product,
-                                                barcode: data.__barcode,
+                                                barcode: data.__barcode!,
                                                 barcodePath: data.__uploadPath
                                             }))
-                                            .chain( (_,__) => ResponseMessage.successMessage("Barcode successfully generated") )
+                                            .chain((_, __) => ResponseMessage.successMessage("Barcode successfully generated"))
                                             .catchErrors()
                                             .handle<TError>({
                                                 'Default': (err: TError) => TE.left(err),
@@ -41,28 +47,32 @@ export default class GenerateBarcodeFeature extends BaseFeature<TError, any> {
                                             .run();
     }
 
-    generateBarcode(){
+    generateBarcode() {
 
-        let code = '580';
+        return E.tryCatch(
+            () => {
+                let code = '580';
 
-        while (code.length < 12) {
-            code += Math.floor(Math.random() * 10);
-        }
+                while (code.length < 12) {
+                    code += Math.floor(Math.random() * 10);
+                }
 
-        let sum = 0;
+                let sum = 0;
 
-        for (let i = 0; i < 12; i++) {
-            sum += parseInt(code[i]) * (i % 2 === 0 ? 1 : 3);
-        }
+                for (let i = 0; i < 12; i++) {
+                    sum += parseInt(code[i]) * (i % 2 === 0 ? 1 : 3);
+                }
 
-        const checkDigit = (10 - (sum % 10)) % 10;
-        
-        return TE.right( 
-            (code + checkDigit).toString() 
-        );
+                const checkDigit = (10 - (sum % 10)) % 10;
+
+                return (code + checkDigit).toString();
+            },
+            (err) => AppErrors.HandledError(err, "There was an error")
+        )
+            
     }
 
-    generateBarcodeImage( barcode: string ){
+    generateBarcodeImage(barcode: string) {
         return E.tryCatch(
             () => {
                 const canvas = createCanvas(200, 100);
@@ -84,24 +94,24 @@ export default class GenerateBarcodeFeature extends BaseFeature<TError, any> {
         )
     }
 
-    uploadBarcodeImage( image: string ){
+    uploadBarcodeImage(image: string) {
 
         return pipe(
-            TE.fromEither( validateImage(image) ),
-            TE.flatMap( validatedImage => uploadImage(validatedImage, 'barcodes') )
+            TE.fromEither(validateImage(image)),
+            TE.flatMap(validatedImage => uploadImage(validatedImage, 'barcodes'))
         )
     }
 
-    updateBarcodeImagePathToProduct( opts: { productId: string, barcode: string, barcodePath: string } ){
+    updateBarcodeImagePathToProduct(opts: { productId: string, barcode: string, barcodePath: string }) {
 
         return TE.tryCatch(
             () => dbq.updateTable("products")
-                     .set({
-                        barcode: opts.barcode,
-                        barcodeImage: opts.barcodePath
-                     })
-                     .where("id", '=', opts.productId)
-                     .executeTakeFirstOrThrow(),
+                .set({
+                    barcode: opts.barcode,
+                    barcodeImage: opts.barcodePath
+                })
+                .where("id", '=', opts.productId)
+                .executeTakeFirstOrThrow(),
             (err) => AppErrors.DBError(err, "There was an error saving the barcode")
         )
     }

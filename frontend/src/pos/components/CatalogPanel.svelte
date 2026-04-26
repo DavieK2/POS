@@ -176,12 +176,12 @@
           {@const count = cat.productCount}
           <button onclick={() => selectCategory(cat)} disabled={isHeld || !activeOrder} class="group relative flex flex-col p-3 rounded-[14px] border border-zinc-200 bg-white hover:border-zinc-300 hover:shadow-sm transition-all text-left overflow-hidden active:scale-[0.98] disabled:active:scale-100" aria-label="Browse {cat.categoryName} category — {count} items">
             <div class="flex items-start justify-between mb-2.5">
-              <div class="w-10 h-10 rounded-lg flex items-center bg-zinc-800/95 justify-center text-lg text-white font-bold shrink-0">
+              <div class="w-10 h-10 rounded-lg flex items-center bg-zinc-500 justify-center text-lg text-white font-bold shrink-0">
                 {cat.categoryName.charAt(0).toUpperCase()}
               </div>
               <span class="text-[10px] font-bold text-white rounded-full h-5 w-5 bg-zinc-300 flex items-center justify-center shrink-0">{count}</span>
             </div>
-            <p class="text-sm font-bold text-zinc-800 mb-2">{cat.categoryName}</p>
+            <p class="text-sm font-semibold text-zinc-700 mb-2">{cat.categoryName}</p>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" class="absolute bottom-3 right-3 text-zinc-300 group-hover:text-zinc-500 transition-colors" aria-hidden="true"><path d="M9 18l6-6-6-6" /></svg>
           </button>
         {/if}

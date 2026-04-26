@@ -1,7 +1,8 @@
 <script lang="ts">
+  import { showToast } from "../../../lib/toast";
   import Dropdown from "../../../shared/dropdown.svelte";
   import type { DropDownOptions, Product } from "../../../shared/types";
-  import { BASE_URL } from "../../../utils";
+  import { api } from "../../../utils";
   import type { ProductFormData } from "../main/types";
   import { onMount } from "svelte";
 
@@ -22,14 +23,24 @@
   let fileInput: HTMLInputElement;
 
   onMount(() => {
-    if (currentProduct?.productImage) imagePreview = currentProduct.productImage;
+    if (currentProduct){ 
+      const data = {
+        name: currentProduct.productName || '',
+        category: currentProduct.categoryId || '',
+        price: currentProduct.price || 0,
+        quantity: currentProduct.quantity ||  0,
+        imagePreview: currentProduct.productImage
+      }
+      formData = data
+    }
+
   });
 
-  const formData : ProductFormData = $derived({
-      name: currentProduct?.productName || '',
-      category: currentProduct?.categoryId || '',
-      price: currentProduct?.price || 0,
-      quantity: currentProduct?.quantity ||  0
+  let formData : ProductFormData = $state({
+      name:  '',
+      category:  '',
+      price: 0,
+      quantity: 0
   })
 
   function handleImageFile(file: File) {
@@ -67,27 +78,21 @@
 
     if (  !currentProduct ) return;
 
-    const req = await fetch(`${BASE_URL}/product/update/${currentProduct.id}`, {
+    await api({
+        url: `/product/update/${currentProduct.id}`,
         method: 'PATCH',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        withAuth: true,
+        body: {
             productName: formData.name,
             category: formData.category,
             price: formData.price,
             quantity: formData.quantity,
             description: formData.description,
             image: formData.image
-        })
+        },
+        onSuccess: (res) => onProductEdited({ message: res.message }),
+        onFail: (res) => showToast(res.message)
     });
-
-    
-    const res = await req.json();
-    if( ! req.ok ) {
-      console.log(res);
-      return
-    } 
-  
-    onProductEdited({ message: res.message })
   }
 
 </script>
@@ -95,10 +100,6 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
-  onclick={closeEditModal}
-  onkeydown={(e) => {
-    if (e.key === "Enter" || e.key === " ") closeEditModal();
-  }}
 >
   <div class="bg-white rounded-2xl shadow-2xl max-h-[95vh] w-full max-w-md overflow-hidden animate-scale-in" role="dialog" aria-modal="true" aria-labelledby="edit-modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
     <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">

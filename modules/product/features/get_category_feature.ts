@@ -15,7 +15,7 @@ export default class GetCategoryFeature extends BaseFeature<TError, any> {
 
     async handle(params: ParamsType & Auth ): Promise<E.Either<TError, any>> {
          return await GetCategoryFeature.use<typeof params, typeof params>(params)
-                                        // .withAuth()
+                                        .withAuth()
                                         .chain((_,__) => this.getCategories() )
                                         .catchErrors()
                                         .handle<TError>({

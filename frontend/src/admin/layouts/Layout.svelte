@@ -4,6 +4,7 @@
   import Icon from '../../lib/Icon.svelte';
   import { goto } from '@mateothegreat/svelte5-router';
   import { toastMessage } from '../../lib/toast';
+  import logo from "../../assets/logo.jpg"
 
 
   let { children }  = $props();
@@ -55,7 +56,7 @@
 {#if $toastMessage}
   <div class="toast-container">
     <div class="toast-pill">
-      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5"><polyline points="20 6 9 17 4 12" /></svg>
+      <!-- <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#4ADE80" stroke-width="2.5"><polyline points="20 6 9 17 4 12" /></svg> -->
       {$toastMessage}
     </div>
   </div>
@@ -71,15 +72,12 @@
     aria-label="Main navigation"
   >
     <div class="p-5 border-b border-neutral-700 shrink-0">
-      <div class="flex items-center gap-3">
-        <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center">
-          <Icon name='store' class='w-5 h-5 text-neutral-900' />
+     
+        <div class="flex items-center gap-3">
+          <img class="h-12 w-12 rounded-full" src={logo} alt="">
+          <div class="font-bold text-lg tracking-tight">Vine POS</div>
         </div>
-        <div>
-          <div class="font-bold text-lg tracking-tight">Retail POS</div>
-          <div class="text-xs text-neutral-400">Cloth Store</div>
-        </div>
-      </div>
+     
     </div>
 
     <nav class="flex-1 p-3 overflow-y-auto overflow-x-hidden">
@@ -103,7 +101,9 @@
     </nav>
 
     <div class="p-4 border-t border-neutral-700 shrink-0">
-      <div class="text-xs text-neutral-400 text-center">Version 1.0.0</div>
+      <button type="button" class="text-sm text-neutral-400 border cursor-pointer border-gray-200 hover:bg-gray-50/10 transition-all hover:scale-95 rounded-lg w-full px-2 py-3">
+        Logout
+      </button>
     </div>
   </aside>
 

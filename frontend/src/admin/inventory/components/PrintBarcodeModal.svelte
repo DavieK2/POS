@@ -1,7 +1,7 @@
 <script lang="ts">
   import { onMount } from "svelte";
   import Dropdown from "../../../shared/dropdown.svelte";
-  import { BASE_URL } from "../../../utils";
+  import { api, BASE_URL } from "../../../utils";
   import { showToast } from "../../../lib/toast";
   import Button from "../../../shared/button.svelte";
   import type { DropDownOptions, PrinterData, Product } from "../../../shared/types";
@@ -56,46 +56,31 @@
       return
     };
 
-    const req: Response = await fetch(`${BASE_URL}/print/barcode/${currentProduct.id}`, {
+    await api({
+      url: `/print/barcode/${currentProduct.id}`,
       method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
+      withAuth: true,
+      body: {
         printer: selectedPrinter.value,
         paperSize: selectedPaperSize,
         width: labelWidth,
         height: labelHeight,
         quantity: printQuantity,
-      }),
+      },
+      onSuccess: (res) => {
+        showToast(res.message);
+        isPrinting = false;
+      },
+      onFail: (res) => {
+        showToast(res.message);
+        isPrinting = false
+      }
     });
-    
-    const res = await req.json();
-
-    if( ! req.ok ){
-       
-      showToast(res.message);
-      isPrinting = false
-      return
-
-    }
-
-    showToast(res.message);
-
-    isPrinting = false;
-
-    return;
-    // closePrintBarcodeModal();
   };
 </script>
 
 <div
   class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
-  onclick={closePrintBarcodeModal}
-  onkeydown={(e) => {
-    if (e.key === "Enter" || e.key === " ") closePrintBarcodeModal();
-  }}
-  aria-hidden="true"
 >
   <div class="bg-white rounded-2xl max-h-[95vh] shadow-2xl w-full max-w-md overflow-hidden animate-scale-in" role="dialog" aria-modal="true" aria-labelledby="print-barcode-modal-title" tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
     <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">

@@ -1,6 +1,7 @@
 <script lang="ts">
+  import { showToast } from "../../../lib/toast";
   import type { Category } from "../../../shared/types";
-  import { BASE_URL } from "../../../utils";
+  import { api, BASE_URL } from "../../../utils";
 
     
     let { 
@@ -30,28 +31,18 @@
         return;
       }
     
-      const req = await fetch(`${BASE_URL}/category/update/${currentCategory.id}`, {
+      await api({
+          url: `/category/update/${currentCategory.id}`,
           method: 'PATCH',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ categoryName: newName })
+          withAuth: true,
+          body: { categoryName: newName },
+          onSuccess: (res) => onCategoryEdited({ message: res.message }),
+          onFail: (res) => showToast(res.message)
       });
-      
-      const res = await req.json()
-
-      if( ! req.ok ) {
-        console.log(res)
-        return;
-      }
-
-      onCategoryEdited({ message: res.message })
-
   }
 </script>
 <div
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
-    onclick={closeEditCategoryModal}
-    onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeEditCategoryModal(); }}
-    aria-hidden="true"
   >
     <div
       class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in"

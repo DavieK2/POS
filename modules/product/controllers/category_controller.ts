@@ -9,22 +9,22 @@ import DeleteCategoryFeature from "../features/delete_category_feature.ts";
 export default class CategoryController extends BaseController {
     
     @Get('/categories')
-    async getCategories({ request } : HttpContext ) {
-       return this.process( new GetCategoryFeature, { ...request.all() } )
+    async getCategories({ request, auth } : HttpContext ) {
+       return this.process( new GetCategoryFeature, { ...request.all(), auth } )
     }
 
     @Post('/category')
-    async addCategory( { request } : HttpContext) {
-        return this.process( new AddCategoryFeature, { ...request.all() })
+    async addCategory( { request, auth } : HttpContext) {
+        return this.process( new AddCategoryFeature, { ...request.all(), auth })
     }
 
     @Patch('/category/update/:categoryId')
-    async updateCategory( { request } : HttpContext) {
-        return this.process( new UpdateCategoryFeature, { ...request.all(), ...request.params() })
+    async updateCategory( { request, auth } : HttpContext) {
+        return this.process( new UpdateCategoryFeature, { ...request.all(), ...request.params(), auth })
     }
 
     @Delete('/category/delete/:categoryId')
-    async deleteCategory( { request } : HttpContext) {
-        return this.process( new DeleteCategoryFeature, { ...request.params() })
+    async deleteCategory( { request, auth } : HttpContext) {
+        return this.process( new DeleteCategoryFeature, { ...request.params(), auth })
     }
 }

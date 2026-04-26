@@ -7,7 +7,6 @@ import { type } from "arktype";
 import ValidationService from "#services/validation_services";
 import { dbq } from "#config/db";
 import { sql } from "kysely";
-import ResponseMessage from "#services/response_message";
 
 const rules = type({
     query: "string & string > 0"
@@ -19,7 +18,7 @@ export default class SearchProductsByBarcodeFeature extends BaseFeature<TError, 
 
     async handle(params: ParamsType & Auth ): Promise<E.Either<TError, any>> {
         return await SearchProductsByBarcodeFeature.use<typeof params, typeof params>(params)
-                                                // .withAuth()
+                                                .withAuth()
                                                 .chain((_, data) => ValidationService.validate({ rules, data }))
                                                 .chain( (_, data) => this.searchProductProductBarcode(data.query))
                                                 .chain( (data, __) => TE.right({

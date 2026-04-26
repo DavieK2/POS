@@ -72,7 +72,7 @@ export default class PrintBarcodeFeature extends BaseFeature<TError, any> {
                 ctx.imageSmoothingEnabled = false;
 
                 JsBarcode(canvas, p.barcode, {
-                    format: "CODE128",
+                    format: "EAN13",
                     lineColor: "#000000",
                     background:"#ffffff",
                     width: 1.5,

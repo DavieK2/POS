@@ -1,12 +1,11 @@
 import AppErrors, { TError } from "#exceptions/app_error";
 import * as E from 'fp-ts/lib/Either.js';
 import * as TE from 'fp-ts/lib/TaskEither.js';
-import { pipe } from 'fp-ts/lib/function.js'; // Add this import
+import { pipe } from 'fp-ts/lib/function.js';
 import BaseFeature from "../../../app/contracts/base_feature.js";
 import { Auth } from "#services/pipeline_builder";
 import { type } from "arktype";
 import { dbq } from "#config/db";
-import { Expression, sql, SqlBool } from "kysely";
 
 const rules = type({
     query: "string>0 | (string>0)[] > 0",

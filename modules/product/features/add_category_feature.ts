@@ -22,7 +22,7 @@ export default class AddCategoryFeature extends BaseFeature<TError, any> {
 
     async handle(params: ParamsType & Auth ): Promise<E.Either<TError, any>> {
          return await AddCategoryFeature.use<typeof params, typeof params>(params)
-                                        // .withAuth()
+                                        .withAuth()
                                         .chain({
                                             action: (_, data) => ValidationService.validate({ rules, data })
                                         })

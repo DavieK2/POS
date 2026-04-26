@@ -19,7 +19,7 @@ export default class DeleteProductFeature extends BaseFeature<TError, any> {
 
     async handle(params: ParamsType & Auth ): Promise<E.Either<TError, any>> {
         return await DeleteProductFeature.use<typeof params, typeof params>(params)
-                                        // .withAuth()
+                                        .withAuth()
                                         .chain( (_, data) => ValidationService.validate({ rules, data }))
                                         .chain( (_, data) => validateProduct( data.product ) )
                                         .chain( (_, data) => this.deleteProduct( data.product) )

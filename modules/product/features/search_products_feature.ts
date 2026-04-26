@@ -20,7 +20,7 @@ export default class SearchProductsFeature extends BaseFeature<TError, any> {
 
     async handle(params: ParamsType & Auth ): Promise<E.Either<TError, any>> {
         return await SearchProductsFeature.use<typeof params, typeof params>(params)
-                                                // .withAuth()
+                                                .withAuth()
                                                 .chain((_, data) => ValidationService.validate({ rules, data }))
                                                 .chain( (_, data) => this.searchProduct({query: data.query, category: data.category, barcode: data.barcode }))
                                                 .catchErrors()

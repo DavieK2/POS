@@ -1,7 +1,7 @@
 <script lang="ts">
   import { showToast } from "../../../lib/toast";
   import type { Category } from "../../../shared/types";
-  import { BASE_URL } from "../../../utils";
+  import { api, BASE_URL } from "../../../utils";
 
 
     let { 
@@ -17,28 +17,20 @@
     const handleDeleteCategory = async (): Promise<void> => {
     if (! currentCategory) return;
 
-    const req = await fetch(`${BASE_URL}/category/delete/${currentCategory.id}`, {
+    await api({
+        url: `/category/delete/${currentCategory.id}`,
         method: 'DELETE',
+        withAuth: true,
+        onSuccess: (res) => onCategoryDeleted({message: res.message}),
+        onFail: (res) => showToast(res.message)
     });
-
-    const res = await req.json()
-
-    if( ! req.ok ) {
-      console.log(res)
-      showToast(res.message)
-      return;
-    }
-
-    onCategoryDeleted({message: res.message})
+    
   }
 
 </script>
 
 <div
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
-    onclick={closeDeleteCategoryModal}
-    onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeDeleteCategoryModal(); }}
-    aria-hidden="true"
   >
     <div
       class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in"

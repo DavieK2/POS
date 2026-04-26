@@ -39,7 +39,7 @@
   }
 </script>
 
-<header class="shrink-0 h-12 bg-white border-b border-zinc-200 flex items-center justify-between px-5 z-10">
+<header class="shrink-0 h-16 bg-white border-b border-zinc-300 flex items-center justify-between px-5 z-10">
   <div class="flex items-center gap-2">
     <img class="h-8 w-8" src={logo} alt="">
     <span class="font-bold text-[20px] text-zinc-700">Vine POS</span>

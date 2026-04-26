@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { cn } from "../utils";
+
   interface Props {
     label?: string;
     loading?: boolean;
@@ -20,8 +22,8 @@
   type="submit"
   {onclick}
   disabled={isDisabled}
-  class="flex-1 px-4 py-2.5 bg-black text-white rounded-xl font-medium transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none
-    {isDisabled ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-800'}"
+  class={ cn(`flex-1 px-4 py-2.5 bg-black text-white rounded-xl font-medium transition-colors focus:ring-2 focus:ring-neutral-400 focus:outline-none
+    ${isDisabled} ? 'opacity-50 cursor-not-allowed' : 'hover:bg-neutral-800'}`)}
 >
   {#if loading}
     <span class="flex items-center justify-center gap-2">

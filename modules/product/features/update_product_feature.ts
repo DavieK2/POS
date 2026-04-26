@@ -25,7 +25,7 @@ export default class UpdateProductFeature extends BaseFeature<TError, any> {
 
     async handle(params: ParamsType & Auth ): Promise<E.Either<TError, any>> {
         return await UpdateProductFeature.use<typeof params, typeof params>(params)
-                                        // .withAuth()
+                                        .withAuth()
                                         .chain( (_, data) => ValidationService.validate({ rules, data }))
                                         .chain( (_, data) => validateProduct( data.product ) )
                                         .chainWhenAndStore({

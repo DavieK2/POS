@@ -12,37 +12,37 @@ import SearchProductsFeature from "#modules/product/features/search_products_fea
 export default class ProductsController extends BaseController {
     
     @Get('/products')
-    async getProducts({ request } : HttpContext ) {
-        return this.process( new GetProductsFeature, { ...request.all() } )
+    async getProducts({ request, auth } : HttpContext ) {
+        return this.process( new GetProductsFeature, { ...request.all(), auth  } )
     }
 
     @Post('/product')
-    async addProduct( { request } : HttpContext) {
-        return this.process( new AddProductFeature, { ...request.all() })
+    async addProduct( { request, auth } : HttpContext) {
+        return this.process( new AddProductFeature, { ...request.all(), auth })
     }
 
     @Patch('/product/update/:product')
-    async updateProduct( { request } : HttpContext) {
-        return this.process( new UpdateProductFeature, { ...request.all(), ...request.params() })
+    async updateProduct( { request, auth } : HttpContext) {
+        return this.process( new UpdateProductFeature, { ...request.all(), ...request.params(), auth })
     }
 
     @Delete('/product/delete/:product')
-    async deleteProduct( { request } : HttpContext) {
-        return this.process( new DeleteProductFeature, { ...request.params() })
+    async deleteProduct( { request, auth } : HttpContext) {
+        return this.process( new DeleteProductFeature, { ...request.params(), auth })
     }
 
     @Post('/product/generate-barcode/:product')
-    async generateProductBarcode( { request } : HttpContext){
-        return this.process( new GenerateBarcodeFeature, { ...request.params() } )
+    async generateProductBarcode( { request, auth } : HttpContext){
+        return this.process( new GenerateBarcodeFeature, { ...request.params(), ...request.all(), auth } )
     }
 
     @Get('/products/search/barcode')
-    async searchProductsByBarcode({ request } : HttpContext ) {
-        return this.process( new SearchProductsBarcodeFeature, { ...request.all() } )
+    async searchProductsByBarcode({ request, auth } : HttpContext ) {
+        return this.process( new SearchProductsBarcodeFeature, { ...request.all(), auth } )
     }
 
     @Get('/products/search')
-    async searchProductsByProductName({ request } : HttpContext ) {
-        return this.process( new SearchProductsFeature, { ...request.all() } )
+    async searchProductsByProductName({ request, auth } : HttpContext ) {
+        return this.process( new SearchProductsFeature, { ...request.all(), auth } )
     }
 }

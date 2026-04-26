@@ -59,6 +59,7 @@
         url: '/category',
         method: "POST",
         body: { categoryName, categoryImage },
+        withAuth: true,
         onFail: (data) => showToast(data.message),
         onSuccess: (data) =>  onCategoryAdded({ message: data.message })
     });
@@ -70,11 +71,6 @@
 
 <div
   class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
-  onclick={closeAddCategoryModal}
-  onkeydown={(e) => {
-    if (e.key === "Enter" || e.key === " ") closeAddCategoryModal();
-  }}
-  aria-hidden="true"
 >
   <div class="bg-white rounded-2xl shadow-2xl max-h-[95vh] w-full max-w-md overflow-hidden animate-scale-in" role="dialog" aria-modal="true" aria-labelledby="add-category-title" tabindex="-1" onclick={(e) => e.stopPropagation()} onkeydown={(e) => e.stopPropagation()}>
     <div class="px-6 py-4 border-b border-neutral-200 flex items-center justify-between">

@@ -19,7 +19,7 @@ export default class DeleteCategoryFeature extends BaseFeature<TError, any> {
 
     async handle(params: ParamsType & Auth ): Promise<E.Either<TError, any>> {
           return await DeleteCategoryFeature.use<typeof params, typeof params>(params)
-                                            // .withAuth()
+                                            .withAuth()
                                             .chain( (_,data) => ValidationService.validate( { data, rules }) )
                                             .chain( (_,data) => validateCategory( data.categoryId ) )
                                             .chain( (_,data) => this.deleteCategory( data ) )

@@ -10,9 +10,6 @@
 
 <div
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
-    onclick={closeViewProductModal}
-    onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeViewProductModal(); }}
-    aria-hidden="true"
   >
     <div
       class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in max-h-[95vh]"

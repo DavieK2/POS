@@ -3,7 +3,7 @@
   import Button from "../../../shared/button.svelte";
   import Dropdown from "../../../shared/dropdown.svelte";
   import type { DropDownOptions } from "../../../shared/types";
-  import { BASE_URL } from "../../../utils";
+  import { api, BASE_URL } from "../../../utils";
   import type {  ProductFormData } from "../main/types";
 
   let { closeAddModal, onProductAdded, categoryOptions } : {
@@ -59,37 +59,32 @@
 
       e.preventDefault();
 
-      const req = await fetch(`${BASE_URL}/product`, {
+      await api({
+          url: `/product`,
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
+          withAuth: true,
+          body: {
               productName: formData.name,
               category: formData.category,
               price: formData.price,
               quantity: formData.quantity,
               description: formData.description,
               image: formData.image
-          })
+          },
+          onSuccess: (res) => {
+            onProductAdded({ message: res.message });
+            isLoading = false;
+          },
+          onFail: (res) => {
+             showToast(res.message)
+          }
       });
-
-      const res = await req.json()
-
-      if( ! req.ok ) {
-        console.log(res)
-        showToast(res.message)
-      }
-
-      onProductAdded({ message: res.message });
-
-      isLoading = false;
   }
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 <div
   class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
-  onclick={closeAddModal}
-  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeAddModal(); }}
 >
   <div
     class="bg-white rounded-2xl shadow-2xl max-h-[95vh] w-full max-w-md overflow-hidden animate-scale-in"

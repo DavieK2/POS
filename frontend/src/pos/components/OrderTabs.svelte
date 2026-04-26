@@ -31,8 +31,8 @@
     {#each otherOrders as o (o.id)}
       {@const t = orderTotal(o)}
       <button
-        class="flex items-center gap-2 bg-white border-2 rounded-full px-3 h-9 whitespace-nowrap shrink-0 transition-all 
-               {isLocked ? 'opacity-40 cursor-not-allowed pointer-events-none grayscale' : 'hover:border-zinc-400 border-zinc-500'}"
+        class="flex items-center gap-2 bg-white border-[1.5px] rounded-full px-3 h-9 whitespace-nowrap shrink-0 transition-all 
+               {isLocked ? 'opacity-40 cursor-not-allowed pointer-events-none grayscale' : 'hover:border-zinc-500 border-zinc-400'}"
         onclick={(e) => { e.stopPropagation(); onSelectOrder(o); }}
         aria-label="Switch to order #{o.orderId}"
       >

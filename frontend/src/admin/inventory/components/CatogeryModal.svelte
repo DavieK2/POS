@@ -19,9 +19,6 @@
 
 <div
   class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-zinc-950/40 backdrop-blur-md animate-fade-in"
-  onclick={closeManageCategoriesModal}
-  onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeManageCategoriesModal(); }}
-  aria-hidden="true"
 >
   <div
     class="bg-white rounded-2xl shadow-[0_16px_40px_rgb(0,0,0,0.12)] w-full max-w-2xl overflow-hidden animate-scale-in flex flex-col max-h-[95vh]"

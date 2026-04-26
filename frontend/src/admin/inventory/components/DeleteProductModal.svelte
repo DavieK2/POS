@@ -1,7 +1,7 @@
 <script lang="ts">
   import { showToast } from "../../../lib/toast";
   import type { Product } from "../../../shared/types";
-  import { BASE_URL } from "../../../utils";
+  import { api, BASE_URL } from "../../../utils";
 
 
   let { currentProduct, onProductDeleted, closeDeleteProductModal: closeDeleteModal } : {
@@ -14,28 +14,20 @@
 
     if (!currentProduct) return;
 
-    const req = await fetch(`${BASE_URL}/product/delete/${currentProduct.id}`, {
+    await api({
+        url: `/product/delete/${currentProduct.id}`,
         method: 'DELETE',
+        withAuth: true,
+        onSuccess: (res) => onProductDeleted({ message: res.message }),
+        onFail: (res) =>  showToast(res.message)
     });
-
-    const res = await req.json()
     
-    if( ! req.ok ) {
-      console.log(res);
-      showToast(res.message)
-      return
-    }
-    
-    onProductDeleted({ message: res.message })
   }
 
 
 </script>
 <div
     class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-fade-in"
-    onclick={closeDeleteModal}
-    onkeydown={(e) => { if (e.key === 'Enter' || e.key === ' ') closeDeleteModal(); }}
-    aria-hidden="true"
   >
     <div
       class="bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-scale-in"

@@ -173,7 +173,7 @@
         body: {
           items: activeOrder.items.flatMap((i) => [{ productId: i.id, qty: i.qty }]),
         },
-        onSuccess: (_) => showToast("Quantity updated."),
+        onSuccess: (_) => showToast("Order Updated"),
         onFail: (res) => {
           existing.qty = qty;
           showToast(res.message);
@@ -281,7 +281,11 @@
       body: {
         items: activeOrder.items.flatMap((i) => [{ productId: i.id, qty: i.qty }]),
       },
-      onSuccess: (_) => showToast("Order has been held"),
+      onSuccess: (_) => {
+        if( activeOrder?.status === "held" ){
+          showToast("Order has been held")
+        }
+      },
       onFail: (res) => {
         activeOrder!.status = status;
         showToast(res.message);
@@ -353,7 +357,7 @@
         body: {
           note: activeOrder.note,
         },
-        onSuccess: (_) => showToast("Note added."),
+        onSuccess: (_) => showToast("Note added"),
         onFail: (res) => {
           activeOrder!.note = note;
           showToast(res.message);
@@ -577,7 +581,7 @@
     </section>
 
     <!-- svelte-ignore a11y_click_events_have_key_events -->
-    <aside class="w-95 bg-white border-l border-zinc-200 flex flex-col shrink-0 overflow-hidden" onclick={(e) => e.stopPropagation()}>
+    <aside class="w-95 bg-white border-l border-zinc-300 flex flex-col shrink-0 overflow-hidden" onclick={(e) => e.stopPropagation()}>
       <div class="shrink-0 p-3 pb-3 border-b border-zinc-100">
         <div class="flex bg-zinc-100 p-0.75 rounded-[10px] gap-0.75 items-center {!hasActiveOrder || isHeld ? 'opacity-40 cursor-not-allowed' : ''}">
           <button

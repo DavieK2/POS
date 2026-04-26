@@ -27,7 +27,7 @@ export default class AddProductFeature extends BaseFeature<TError, any> {
 
     async handle(params: ParamsType & Auth ): Promise<E.Either<TError, any>> {
           return await AddProductFeature.use<typeof params, typeof params>(params)
-                                        // .withAuth()
+                                        .withAuth()
                                         .chain( (_, data) => ValidationService.validate({ data, rules }) )
                                         .chainAsyncAndStore('dbTransaction', (_,__) => startDBTrasaction() )
                                         .chainWhenAndStore({
